@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+ <html lang="en">
+
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Versa Wear(AR) - Web App Dashboard</title>
+  <link rel="stylesheet" href="../../css/app.css">
+  <script src="../../dist/bundle.js"></script>
+  </head>
+
+ <body>
+  <div class="app-container">
+  <header class="app-header">
+   <div class="header-left">
+    <h1 class="logo">VersaW(AR)e</h1>
+   </div>
+   <nav class="header-nav">
+    <ul class="nav-list">
+     <li class="nav-item"><a href="#" class="nav-link active">Dashboard</a></li>
+     <li class="nav-item"><a href="#" class="nav-link">Settings</a></li>
+     <li class="nav-item"><a href="#" class="nav-link">Help</a></li>
+     <li class="nav-item"><a href="#" class="nav-link">Logout</a></li>
+    </ul>
+   </nav>
+  </header>
+
+  <main class="app-main">
+   <section id="data-upload" class="app-section">
+    <h2 class="section-title">Data Input</h2>
+    <div class="upload-area">
+     <input type="file" id="csvFile" accept=".csv" class="input-file">
+     <label for="csvFile" class="upload-button">Choose CSV File</label>
+     <button id="uploadButton" class="button">Upload and Analyze</button>
+     <div id="upload-status" class="status-message"></div>
+    </div>
+   </section>
+
+   <section id="data-visualization" class="app-section">
+    <h2 class="section-title">Data Visualization</h2>
+    <canvas id="myChart"></canvas>
+   </section>
+
+   <section id="analysis-results" class="app-section">
+    <h2 class="section-title">Analysis Results</h2>
+    <div id="output" class="output-area"></div>
+   </section>
+
+   <section id="ar-controls" class="app-section">
+    </section>
+  </main>
+
+  <footer class="app-footer">
+   </footer>
+  </div>
+ </body>
+
+ </html>

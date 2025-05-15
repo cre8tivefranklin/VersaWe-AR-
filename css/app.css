@@ -1,0 +1,199 @@
+/* Resetting default browser styles for consistency */
+ body,
+ h1,
+ h2,
+ p,
+ ul,
+ li {
+  margin: 0;
+  padding: 0;
+ }
+
+ body {
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  background-color: #f4f6f9;
+  color: #333;
+ }
+
+ .app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+ }
+
+ /* Header */
+ .app-header {
+  background-color: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 0;
+ }
+
+ .header-left {
+  display: flex;
+  align-items: center;
+ }
+
+ .logo {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  color: #007bff;
+ }
+
+ .header-nav {
+  /* You might want to add more styling here */
+ }
+
+ .nav-list {
+  list-style: none;
+  display: flex;
+ }
+
+ .nav-item {
+  margin-left: 1rem;
+ }
+
+ .nav-link {
+  text-decoration: none;
+  color: #333;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+ }
+
+ .nav-link:hover {
+  background-color: #e0e0e0;
+ }
+
+ .nav-link.active {
+  background-color: #007bff;
+  color: #fff;
+ }
+
+ /* Main Content */
+ .app-main {
+  padding: 1rem 0;
+ }
+
+ .app-section {
+  background-color: #fff;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.05);
+ }
+
+ .section-title {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #555;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 0.5rem;
+ }
+
+ /* Upload Area */
+ .upload-area {
+  display: flex;
+  align-items: center;
+ }
+
+ .input-file {
+  display: none;
+ }
+
+ .upload-button {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  color: #555;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  margin-right: 1rem;
+ }
+
+ .upload-button:hover {
+  background-color: #e0e0e0;
+ }
+
+ .button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 1rem;
+ }
+
+ .button:hover {
+  background-color: #0056b3;
+ }
+
+ .button.primary {
+  background-color: #28a745;
+ }
+
+ .button.primary:hover {
+  background-color: #1e7e34;
+ }
+
+ .status-message {
+  margin-left: 1rem;
+  color: #dc3545;
+ }
+
+ /* Analysis Results */
+ .output-area {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  background-color: #f9f9f9;
+  border-radius: 0.25rem;
+ }
+
+ /* AR Controls */
+ .controls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+ }
+
+ .control-item {
+  display: flex;
+  flex-direction: column;
+ }
+
+ .control-label {
+  font-size: 0.875rem;
+  color: #777;
+  margin-bottom: 0.25rem;
+ }
+
+ .control-select {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+  font-size: 1rem;
+ }
+
+ .chart-buttons {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+ }
+
+ .chart-buttons .button {
+  margin-left: 0.5rem;
+ }
+
+ /* Footer */
+ .app-footer {
+  text-align: center;
+  padding: 1rem 0;
+  background-color: #f0f0f0;
+  border-top: 1px solid #e0e0e0;
+  font-size: 0.875rem;
+  color: #777;
+ }
