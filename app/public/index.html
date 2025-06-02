@@ -9,17 +9,15 @@
 <body>
     <header>
         <div class="container">
-            <div class="logo">
-                <img src="../../css/Logo.png" alt="VersaWe(AR) Logo" height="150">
+            <div class="logo menu-toggle">
+                <img src="../../css/Logo.png" alt="VersaWe(AR) Logo" height="50">
             </div>
             <nav>
-                <ul>
+                <ul class="nav-links">
                     <li><a href="#product">Product</a></li>
                     <li><a href="#features">Features</a></li>
                     <li><a href="#vision">Vision</a></li>
                     <li><a href="#contact">Contact</a></li>
-                </ul>
-                <ul>
                     <li><a href="app" target="_blank">VersaW(AR)e</a></li>
                 </ul>
             </nav>
@@ -30,12 +28,15 @@
         <section id="hero">
             <div class="container">
                 <div class="hero-content">
-                    <h1>Experience Data in Augmented Reality</h1>
-                    <p class="tagline">Seamlessly connect online information with your physical world using VersaWe(AR).</p>
+                    <h1>Welcome</h1>
+                    <p class="tagline">Augmented Reality For All Is Our Mission</p>
                     <a href="#product" class="button primary">Learn More</a>
                 </div>
                 <div class="hero-image">
-                    <img src="hero-image.png" alt="VersaWe(AR) in use">
+                    <figure>
+                        <img src="../../css/image.png" alt="VersaWe(AR) in use">
+                        <figcaption>VersaWe(AR)<sup>L</sup> Model</figcaption>
+                    </figure>
                 </div>
             </div>
         </section>
@@ -48,11 +49,11 @@
                     <div class="detail-item">
                         <h3>Wearable AR Device</h3>
                         <p>Lightweight, comfortable glasses with advanced lens technology for a clear and stable augmented reality display.</p>
-                        </div>
+                    </div>
                     <div class="detail-item">
                         <h3>Intuitive Web Interface</h3>
                         <p>Effortlessly manage and customize the data overlays on your VersaWe(AR) device through our user-friendly web application.</p>
-                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -89,7 +90,7 @@
                     <li>
                         <i class="icon">💡</i>
                         <h3>Enhanced Understanding</h3>
-                        <p>Gain deeper insights by visualizing data in its real-world context.</p>
+                        <p>Gain deeper insights by visualizing data in its real-world context. Or AI-Powered inferencing. </p>
                     </li>
                 </ul>
             </div>
@@ -98,7 +99,7 @@
         <section id="vision" class="section">
             <div class="container">
                 <h2>Our Vision</h2>
-                <p class="section-intro">We envision a world where information is seamlessly integrated with our daily lives, empowering individuals with knowledge at their fingertips, or rather, in their sight.</p>
+                <p class="section-intro">We envision a world where information is seamlessly integrated with our daily lives, empowering individuals with knowledge at their fingertips, or rather, in their sight. Most of all, a world where augmented reality is not overly expensive and difficult to access.</p>
                 <p>VersaWe(AR) is our step towards making augmented reality a practical and transformative tool for everyone, enhancing understanding and interaction with the world around us.</p>
             </div>
         </section>
@@ -123,6 +124,27 @@
         </div>
     </footer>
 
-    <script src="../../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const nav = document.querySelector('header nav');
+
+            // Find all list items (li) within the nav and then their anchor (a) tags
+            const navLinks = nav.querySelectorAll('ul li a'); 
+
+            menuToggle.addEventListener('click', function() {
+                nav.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+            });
+
+            // Close menu when a link is clicked
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    nav.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                });
+            });
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,16 @@
+Frank Sami
+Prototype for VERSAWARE product 
+5/30/2025
+
+IPO
+
+----GET/INPUTS----
+    text_editor_input
+    
+----GET/INPUTS----
+
+----SET/PROCESSING----
+----SET/PROCESSING----
+
+----SHOW/OUTPUTS----
+----SHOW/OUTPUTS----

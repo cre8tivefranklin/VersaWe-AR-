@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ESP32 TFT WebSocket Transmitter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles for better aesthetics and responsiveness */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+        }
+        .container {
+            max-width: 90%; /* Responsive width */
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border-radius: 0.75rem; /* Rounded corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb; /* Light border */
+        }
+        input[type="text"], textarea {
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box; /* Include padding in width */
+        }
+        button {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #3b82f6; /* Blue */
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2563eb; /* Darker blue */
+        }
+        .btn-secondary {
+            background-color: #6b7280; /* Gray */
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #4b5563; /* Darker gray */
+        }
+        .status-text {
+            font-weight: bold;
+        }
+        .log-area {
+            border: 1px solid #e5e7eb;
+            background-color: #f9fafb;
+            padding: 1rem;
+            max-height: 150px;
+            overflow-y: auto;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            line-height: 1.4;
+            color: #4b5563;
+        }
+        .log-message {
+            margin-bottom: 0.25rem;
+            padding: 0.1rem 0;
+        }
+        .log-message.green { color: #10b981; } /* Tailwind green-500 */
+        .log-message.red { color: #ef4444; }   /* Tailwind red-500 */
+        .log-message.orange { color: #f97316; } /* Tailwind orange-500 */
+        .log-message.blue { color: #3b82f6; }  /* Tailwind blue-500 */
+        .log-message.gray { color: #6b7280; }  /* Tailwind gray-500 */
+    </style>
+</head>
+<body class="p-4">
+    <div class="container flex flex-col space-y-4">
+        <h1 class="text-3xl font-bold text-center text-gray-800">ESP32 TFT WebSocket Transmitter</h1>
+
+        <div class="flex items-center justify-center space-x-2">
+            <label for="esp32IpInput" class="text-gray-700 font-medium">ESP32 IP:</label>
+            <input type="text" id="esp32IpInput" value="192.168.1.213" class="flex-grow max-w-xs text-center" placeholder="Enter ESP32 IP">
+            <button onclick="reconnectWebSocket()" class="btn-primary">Connect</button>
+        </div>
+
+        <p class="text-center text-lg">Status: <span id="status" class="status-text text-red-500">Disconnected</span></p>
+
+        <div class="flex flex-col space-y-2">
+            <label for="editor" class="text-gray-700 font-medium text-left">Text for TFT:</label>
+            <textarea id="editor" rows="4" placeholder="Type your message for the TFT display here..." class="resize-y"></textarea>
+            <div class="flex justify-center space-x-4 mt-2">
+                <button onclick="transmitter()" class="btn-primary">Send to TFT</button>
+                <button onclick="clearTFT()" class="btn-secondary">Clear TFT</button>
+            </div>
+        </div>
+
+        <h3 class="text-xl font-semibold text-gray-800 mt-4 text-left">Activity Log:</h3>
+        <div id="log" class="log-area"></div>
+    </div>
+
+    <script>
+        let ws; // Global WebSocket object
+        let esp32Ip = document.getElementById('esp32IpInput').value; // Initial IP from input
+        const wsPath = "/ws"; // WebSocket path on ESP32
+
+        // Helper function to log messages to the UI
+        function logToDiv(message, color = 'black') {
+            const logDiv = document.getElementById('log');
+            const p = document.createElement('p');
+            p.className = `log-message ${color}`;
+            p.innerText = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logDiv.appendChild(p);
+            logDiv.scrollTop = logDiv.scrollHeight; // Auto-scroll to bottom
+        }
+
+        // Function to establish or re-establish WebSocket connection
+        function connectWebSocket() {
+            esp32Ip = document.getElementById('esp32IpInput').value; // Always get current IP from input
+            if (!esp32Ip || esp32Ip === "YOUR_ESP32_IP_ADDRESS_HERE" || esp32Ip === "") {
+                logToDiv("Please enter the ESP32 IP address first!", 'red');
+                document.getElementById('status').innerText = 'No IP';
+                document.getElementById('status').classList.remove('text-green-500', 'text-orange-500');
+                document.getElementById('status').classList.add('text-red-500');
+                return;
+            }
+
+            // Close any existing connection before opening a new one
+            if (ws && ws.readyState !== WebSocket.CLOSED) {
+                logToDiv("Closing existing WebSocket connection...", 'orange');
+                ws.close();
+            }
+
+            logToDiv(`Attempting to connect to ws://${esp32Ip}${wsPath}...`, 'blue');
+            ws = new WebSocket(`ws://${esp32Ip}${wsPath}`);
+
+            // --- WebSocket Event Handlers ---
+
+            ws.onopen = (event) => {
+                document.getElementById('status').innerText = 'Connected';
+                document.getElementById('status').classList.remove('text-red-500', 'text-orange-500');
+                document.getElementById('status').classList.add('text-green-500');
+                logToDiv("WebSocket connected!", 'green');
+            };
+
+            ws.onmessage = (event) => {
+                logToDiv(`Received from ESP32: ${event.data}`);
+                try {
+                    const receivedData = JSON.parse(event.data);
+                    if (receivedData.type === "status") {
+                        logToDiv(`ESP32 Status: ${receivedData.message}`, 'blue');
+                    } else if (receivedData.type === "error") {
+                        logToDiv(`ESP32 Error: ${receivedData.message}`, 'red');
+                    } else if (receivedData.type === "ack") {
+                        logToDiv(`ESP32 Acknowledged: ${receivedData.action || 'command'} - ${receivedData.status}`, 'blue');
+                    }
+                } catch (e) {
+                    logToDiv(`Error parsing ESP32 message: ${e.message} - Raw: ${event.data}`, 'red');
+                }
+            };
+
+            ws.onclose = (event) => {
+                document.getElementById('status').innerText = 'Disconnected';
+                document.getElementById('status').classList.remove('text-green-500', 'text-orange-500');
+                document.getElementById('status').classList.add('text-red-500');
+                logToDiv(`WebSocket disconnected: Code ${event.code}, Reason: ${event.reason}`, 'orange');
+                // No automatic reconnect here; user clicks "Connect" button
+            };
+
+            ws.onerror = (error) => {
+                logToDiv(`WebSocket error: ${error.message || error}`, 'red');
+                document.getElementById('status').innerText = 'Error';
+                document.getElementById('status').classList.remove('text-green-500', 'text-orange-500');
+                document.getElementById('status').classList.add('text-red-500');
+                ws.close(); // Close to trigger onclose
+            };
+        }
+
+        // --- THE TRANSMITTER FUNCTION ---
+        function transmitter() {
+            let textEditor = document.getElementById("editor");
+            let para_content = textEditor.value; // Get value from textarea
+
+            console.log("Text from editor:", para_content);
+
+            // Check if WebSocket is open before sending
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                // Format the data as a JSON object, as expected by the ESP32
+                const dataToSend = {
+                    type: "display_text", // Matches the 'display_text' type in ESP32 code
+                    text: para_content    // The actual text content
+                };
+                const jsonString = JSON.stringify(dataToSend);
+
+                ws.send(jsonString); // Send the JSON string over WebSocket
+                logToDiv(`Sent to TFT: ${jsonString}`, 'gray');
+                textEditor.value = ''; // Clear textarea after sending (optional)
+            } else {
+                logToDiv("WebSocket not connected. Please click 'Connect' first.", 'red');
+                // Optionally try to connect if not already
+                // connectWebSocket();
+            }
+        }
+
+        // Function to send a command to clear the TFT
+        function clearTFT() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const dataToSend = {
+                    type: "command",
+                    action: "CLEAR_DISPLAY" // Matches the 'CLEAR_DISPLAY' action in ESP32 code
+                };
+                const jsonString = JSON.stringify(dataToSend);
+                ws.send(jsonString);
+                logToDiv(`Sent clear command to TFT: ${jsonString}`, 'gray');
+            } else {
+                logToDiv("WebSocket not connected. Cannot send clear command.", 'red');
+                // connectWebSocket(); // Optionally try to connect if not already
+            }
+        }
+
+        // Function to trigger reconnection (called by the "Connect" button)
+        function reconnectWebSocket() {
+            connectWebSocket();
+        }
+
+        // Initial connection attempt when the page loads
+        document.addEventListener('DOMContentLoaded', connectWebSocket);
+    </script>
+</body>
+</html>

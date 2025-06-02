@@ -1,206 +1,109 @@
-import Chart from 'chart.js/auto';
-import Papa from 'papaparse';
-import OpenAI from "openai";
 
-// Store the current chart instance globally
-let currentChart = null;
 
-// 1. CSV Reading
-async function readCSV(url) {
-    try {
-        const response = await fetch(url);
-        const text = await response.text();
-        const result = Papa.parse(text, { header: true, skipEmptyLines: true });
-        if (result.errors.length > 0) {
-            console.error('CSV Parsing Errors:', result.errors);
-            return [];
-        }
-        return result.data;
-    } catch (error) {
-        console.error('Error fetching and parsing CSV:', error);
-        return [];
-    }
-}
-
-// 2. Charting Function
-function createChart(canvasId, chartType, data, options) {
-    const ctx = document.getElementById(canvasId).getContext('2d');
-    return new Chart(ctx, {
-        type: chartType,
-        data: data,
-        options: options,
-    });
-}
-
-// Function to clear the existing chart
-function clearChart() {
-    if (currentChart) {
-        currentChart.destroy();
-        currentChart = null;
-    }
-}
-
-// 4. Upload Handling and Main Logic
-document.addEventListener('DOMContentLoaded', () => {
-    const fileInput = document.getElementById('csvFile');
-    const uploadButton = document.getElementById('uploadButton');
-    const uploadStatus = document.getElementById('upload-status');
-    const outputDiv = document.getElementById('output');
-
-    uploadButton.addEventListener('click', () => {
-        const file = fileInput.files[0];
-
-        if (file) {
-            uploadStatus.textContent = 'Processing file...';
-            processFile(file);
-        } else {
-            uploadStatus.textContent = 'Please select a CSV file.';
-        }
-    });
-
-    function processFile(file) {
-        const reader = new FileReader();
-
-        reader.onload = function(event) {
-            const csvText = event.target.result;
-            const result = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-            const data = result.data;
-            const csvSet = [csvText, data];
-
-            if (data && data.length > 0) {
-                uploadStatus.textContent = 'CSV file processed successfully.';
-                runAnalysisAndChart(data);
-                outputDiv.textContent = 'CSV data loaded and chart displayed.';
-            } else {
-                uploadStatus.textContent = 'Error processing CSV file or file is empty.';
-                outputDiv.textContent = 'Error loading CSV data.';
-            }
-
-            //-----------------LLM INFERENCING------------------//
-            //1 - set inference
-            function ModelInference(data, model) {
-                let dataSample = data;
-                let inferenceData = dataSample[1];
-                let qrtlyInference = [inferenceData.slice(0, 92), inferenceData.slice(92, 184), inferenceData.slice(184, 276), inferenceData.slice(276, 365)];
-                return qrtlyInference;
-            }
-
-            //2 - set model
-            function Enki_input() {
-                //2.2 - openai model
-                function gpt_Inf() {
-                    let rev_data = ModelInference(csvSet, 0);
-
-                    // Make the API call to your backend server
-                    fetch('/api/openai/completion', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ prompt: `Make an inference in 5 words about the following data trend of cost seen in the following sample${rev_data[0]}` }),
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.error) {
-                            console.error("Error from backend:", data.error);
-                            outputDiv.textContent = `LLM Error: ${data.error}`; // Display error on the page
-                        } else {
-                            console.log("LLM Response:", data.completion);
-                            outputDiv.textContent = `LLM Inference: ${data.completion}`; // Display completion on the page
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error fetching from backend:", error);
-                        outputDiv.textContent = "Error communicating with the LLM server."; // Display a user-friendly error
-                    });
-                }
-
-                //2.3 - set driver function for processing/output 
-                function Enki_Processing() {
-                    function neocortical() {}
-                    function limbic() {}
-                    function amygdalic() {}
-                }
-            }
-            Enki_input();
-            //-----------------LLM INFERENCING------------------//
-        };
-
-        reader.onerror = function(error) {
-            uploadStatus.textContent = `Error reading file: ${error.message}`;
-            outputDiv.textContent = `Error reading file: ${error.message}`;
-        };
-
-        reader.readAsText(file);
-    }
-
-    function runAnalysisAndChart(data) {
-        clearChart();
-
-        if (data && data.length > 0) {
-            const headers = Object.keys(data[0]);
-            const labelColumn = headers[0];
-            const dataColumn = headers[1];
-
-            if (labelColumn && dataColumn) {
-                const chartData = {
-                    labels: data.map(row => row[labelColumn]),
-                    datasets: [{
-                        label: dataColumn,
-                        data: data.map(row => parseFloat(row[dataColumn])),
-                        borderColor: 'blue',
-                        borderWidth: 1,
-                    }],
-                };
-
-                currentChart = createChart('myChart', 'line', chartData, {
-                    responsive: true,
-                    title: { display: true, text: `Data Visualization (${dataColumn} vs ${labelColumn})` },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: { display: true, text: dataColumn }
-                        },
-                        x: {
-                            title: { display: true, text: labelColumn }
-                        }
-                    },
-                });
-
-                populateAxisDropdowns(headers);
-
-            } else {
-                document.getElementById('upload-status').textContent = 'Error: CSV file must have at least two columns for visualization.';
-                console.error('CSV needs at least two columns for charting.');
-                outputDiv.textContent = 'Error: CSV needs at least two columns for charting.';
-            }
-        } else {
-            document.getElementById('upload-status').textContent = 'No data to visualize.';
-            outputDiv.textContent = 'No data to visualize.';
-        }
-    }
-
-    function populateAxisDropdowns(headers) {
-        const xAxisSelect = document.getElementById('x-axis-column');
-        const yAxisSelect = document.getElementById('y-axis-column');
-
-        if (xAxisSelect && yAxisSelect) {
-            xAxisSelect.innerHTML = '';
-            yAxisSelect.innerHTML = '';
-
-            headers.forEach(header => {
-                const optionX = document.createElement('option');
-                optionX.value = header;
-                optionX.textContent = header;
-                xAxisSelect.appendChild(optionX);
-
-                const optionY = document.createElement('option');
-                optionY.value = header;
-                optionY.textContent = header;
-                yAxisSelect.appendChild(optionY);
-            });
-        } else {
-            console.warn('Warning: x-axis or y-axis dropdown elements not found in the HTML.');
-        }
-    }
+const quill = new Quill('#editor', {
+  modules: {
+    toolbar: [
+      [{ header: [1, 2, false] }],
+      ['bold', 'italic', 'underline'],
+      ['image', 'code-block'],
+    ],
+  },
+  placeholder: 'Compose an epic...',
+  theme: 'snow', // or 'bubble'
 });
+
+// Import LLM app
+import {LLM} from "../../../js/llm.js/llm.js";
+
+// State variable to track model load status
+var model_loaded = false;
+
+// Initial Prompt
+var initial_prompt = "transmit js code to an ESP32 controller"
+
+// Callback functions
+const on_loaded = () => { 
+    model_loaded = true; 
+}
+const write_result = (text) => { document.getElementById('result').innerText += text + "\n" }
+const run_complete = () => {}
+
+// Configure LLM app
+const app = new LLM(
+     // Type of Model
+    'GGUF_CPU',
+
+    // Model URL
+    'https://huggingface.co/RichardErkhov/bigcode_-_tiny_starcoder_py-gguf/resolve/main/tiny_starcoder_py.Q8_0.gguf',
+
+    // Model Load callback function
+    on_loaded,          
+
+    // Model Result callback function
+    write_result,       
+
+     // On Model completion callback function
+    run_complete       
+);
+
+// Download & Load Model GGML bin file
+app.load_worker();
+
+// Trigger model once its loaded
+const checkInterval = setInterval(timer, 5000);
+
+function timer() {
+    if(model_loaded){
+            app.run({
+            prompt: initial_prompt,
+            top_k: 1
+        });
+        clearInterval(checkInterval);
+    } else{
+        console.log('Waiting...')
+    }
+}
+
+function transmitter() {
+  let textElement = document.getElementById("editor"); // Changed variable name for clarity
+  let para_content = textElement.textContent; // Get the text from the element
+  
+  console.log(para_content); // Log what's being extracted from the editor
+  
+  const esp32IP = "192.168.1.213"; // Replace with your correct ESP32 IP, as identified by Serial Monitor
+  
+  // *** CRUCIAL ADJUSTMENT 1: Format data for x-www-form-urlencoded ***
+  // The ESP32 expects 'message=YOUR_TEXT'. encodeURIComponent handles spaces and special characters.
+  const dataToSend = `message=${encodeURIComponent(para_content)}`; 
+  
+  console.log("IP: ", esp32IP);
+  console.log("Data Transmitted (body content): ", dataToSend); // Show the actual body sent
+
+  fetch(`http://${esp32IP}/submit_text`, { // *** CRUCIAL ADJUSTMENT 2: Use the correct endpoint ***
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded', // This header is correct
+    },
+    body: dataToSend, // This is the formatted string from above
+  })
+  .then(response => {
+    if (!response.ok) { // Check for HTTP errors (e.g., 404, 500)
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.text(); // Use .text() as ESP32 sends plain text response
+  })
+  .then(data => console.log("ESP32 Response:", data))
+  .catch(error => {
+    // Log the detailed error for debugging
+    console.error('Fetch failed:', error);
+    // Inform the user if needed
+    alert('Failed to send data to ESP32. Please check network and IP address. Error: ' + error.message);
+  });
+}
+
+// To make this function run when the page loads, or based on an event:
+// For testing, you can call it directly:
+// transmitter(); 
+
+// Or, ideally, attach it to a button click:
+document.getElementById("sendButton").addEventListener("click", transmitter);
