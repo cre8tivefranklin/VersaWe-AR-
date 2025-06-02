@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VersaWe(AR) - Visualize Your World</title>
+        <style>
+        /* Basic styling to make the body fill the viewport and enable flexbox for centering */
+        body {
+            display: flex;
+            flex-direction: column; /* Arrange children vertically */
+            min-height: 100vh; /* Ensure the body takes at least the full viewport height */
+            margin: 0; /* Remove default body margin */
+            font-family: 'Inter', sans-serif; /* Use Inter font for consistency */
+        }
+
+        /* Styling for the main content area to center the header */
+        main {
+            flex-grow: 1; /* Allow the main content to take up available space */
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            text-align: center; /* Ensure text inside is also centered */
+            padding: 20px; /* Add some padding around the content */
+        }
+
+        /* Styling for the welcome header */
+        h1 {
+            font-size: 3.5em; /* Large font size for prominence */
+            
+            margin: 0; /* Remove default margin */
+            padding: 10px 20px; /* Add padding for better appearance */
+            background-color: #f8f8f8; /* Light background for the header */
+            border-radius: 15px; /* Rounded corners for the header */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+            animation: fadeIn 1.5s ease-out; /* Add a fade-in animation */
+        }
+        .welcomer{ 
+            text-decoration: none;
+            color: #2c3e50; /* A dark, professional color */
+        }
+        /* Keyframes for the fade-in animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5em; /* Smaller font size on tablets */
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8em; /* Even smaller font size on mobile */
+                padding: 8px 15px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo menu-toggle">
+                <img src="css/Logo.png" alt="VersaWe(AR) Logo" height="50">
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="app/public/app.html" target="_blank">VersaW(AR)e</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <h1><a class="welcomer" href="app/public/index.html">Welcome</a></h1>
+    </main>
+
+     <footer class="app-footer">
+        <p>&copy; 2025 VersaW(AR)e. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>
