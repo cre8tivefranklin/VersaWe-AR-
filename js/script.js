@@ -65,39 +65,38 @@ function timer() {
 }
 
 function transmitter() {
-  let textElement = document.getElementById("editor"); // Changed variable name for clarity
-  let para_content = textElement.textContent; // Get the text from the element
-  
-  console.log(para_content); // Log what's being extracted from the editor
-  
-  const esp32IP = "192.168.1.213"; // Replace with your correct ESP32 IP, as identified by Serial Monitor
-  
-  // *** CRUCIAL ADJUSTMENT 1: Format data for x-www-form-urlencoded ***
-  // The ESP32 expects 'message=YOUR_TEXT'. encodeURIComponent handles spaces and special characters.
-  const dataToSend = `message=${encodeURIComponent(para_content)}`; 
-  
-  console.log("IP: ", esp32IP);
-  console.log("Data Transmitted (body content): ", dataToSend); // Show the actual body sent
+  let textElement = document.getElementById("editor");
+  let para_content = textElement.textContent;
 
-  fetch(`http://${esp32IP}/submit_text`, { // *** CRUCIAL ADJUSTMENT 2: Use the correct endpoint ***
+  console.log(para_content);
+
+  // --- CRUCIAL CHANGE HERE ---
+  // This is the public URL that Cloudflare Tunnel makes available for your ESP32
+  const esp32PublicUrl = "https://esp32.versawear.org"; // <--- Use the exact subdomain you chose in step 5
+
+  const dataToSend = `message=${encodeURIComponent(para_content)}`;
+
+  console.log("Public URL: ", esp32PublicUrl);
+  console.log("Data Transmitted (body content): ", dataToSend);
+
+  fetch(`${esp32PublicUrl}/submit_text`, { // Ensure this matches the 'path' in your config.yaml
     method: 'POST',
     headers: {
-      'Content-Type': 'application/x-www-form-urlencoded', // This header is correct
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
-    body: dataToSend, // This is the formatted string from above
+    body: dataToSend,
   })
   .then(response => {
-    if (!response.ok) { // Check for HTTP errors (e.g., 404, 500)
+    if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    return response.text(); // Use .text() as ESP32 sends plain text response
+    return response.text();
   })
-  .then(data => console.log("ESP32 Response:", data))
+  .then(data => console.log("ESP32 Response (via Cloudflare):", data))
   .catch(error => {
-    // Log the detailed error for debugging
-    console.error('Fetch failed:', error);
-    // Inform the user if needed
-    alert('Failed to send data to ESP32. Please check network and IP address. Error: ' + error.message);
+    console.error('Fetch failed (via Cloudflare Tunnel):', error);
+    // Inform the user if needed, and suggest checking the tunnel status
+    alert('Failed to send data to ESP32. Please ensure the Cloudflare Tunnel is running and your ESP32 is online. Error: ' + error.message);
   });
 }
 
@@ -107,3 +106,5 @@ function transmitter() {
 
 // Or, ideally, attach it to a button click:
 document.getElementById("sendButton").addEventListener("click", transmitter);
+
+// cloudflare cmd: cloudflared tunnel run esp32-controller-tunnel
