@@ -89,8 +89,8 @@ header .logo {
 header .logo img {
     margin-right: 15px;
     padding: 10px;
-    border-radius: 5%;
-    filter: contrast(75%);
+    border-radius: 100%;
+    filter: contrast(175%);
     background-color: #2c3e5096;
 }
 
