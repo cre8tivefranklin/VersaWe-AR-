@@ -90,57 +90,50 @@
         }
 
         // --- Send Text to Selected ESP32 Device ---
-        async function transmitter() {
-            const selectedDeviceId = document.getElementById('selectDeviceId').value;
-            if (!selectedDeviceId) {
-                displayStatus('sendTextStatus', "Please select a device to send text to.", false);
-                return;
-            }
+    async function transmitter() {
+    const selectedDeviceId = document.getElementById('selectDeviceId').value;
+    if (!selectedDeviceId) {
+        displayStatus('sendTextStatus', "Please select a device to send text to.", false);
+        return;
+    }
 
-            const textEditorContent = quill.root.innerHTML; // Get HTML content from Quill
-            // You might want to get plain text, depending on ESP32 processing:
-            // const para_content = quill.getText().trim(); 
-            // For now, let's stick to the HTML content from Quill, or convert to plain text if needed.
-            const para_content = textEditorContent; // Use the HTML content
+    // --- CHANGE THIS LINE TO GET PLAIN TEXT ---
+    const para_content = quill.getText().trim(); 
+    // .getText() gets the plain text content.
+    // .trim() removes any leading/trailing whitespace, including a potential newline Quill might add.
 
-            if (!para_content.trim()) {
-                displayStatus('sendTextStatus', "Please enter some text to send.", false);
-                return;
-            }
+    if (!para_content) { // Changed condition to check for empty string after trim
+        displayStatus('sendTextStatus', "Please enter some text to send.", false);
+        return;
+    }
 
-            console.log(`Sending to device: ${selectedDeviceId}`);
-            console.log("Text content (Quill HTML):", para_content); // Log Quill's HTML content
-            
-            // The URL now includes the device_id as part of the path for the central router
-            const targetURL = `${centralRouterURL}/${selectedDeviceId}/submit_text`;
-            const dataToSend = `message=${encodeURIComponent(para_content)}`; 
-            
-            try {
-                const response = await fetch(targetURL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: dataToSend,
-                });
+    console.log(`Sending to device: ${selectedDeviceId}`);
+    console.log("Text content (Plain Text):", para_content); // Updated console log
+    
+    const targetURL = `${centralRouterURL}/${selectedDeviceId}/submit_text`;
+    const dataToSend = `message=${encodeURIComponent(para_content)}`; 
+    
+    try {
+        const response = await fetch(targetURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: dataToSend,
+        });
 
-                const result = await response.text();
-                if (response.ok) {
-                    displayStatus('sendTextStatus', `Success: ${result}`, true);
-                } else {
-                    displayStatus('sendTextStatus', `Error: ${result}`, false);
-                    console.error('ESP32 Router Response Error:', result);
-                }
-
-            } catch (error) {
-                displayStatus('sendTextStatus', `Network Error: Could not reach router. ${error.message}`, false);
-                console.error('Fetch failed:', error);
-            }
+        const result = await response.text();
+        if (response.ok) {
+            displayStatus('sendTextStatus', `Success: ${result}`, true);
+        } else {
+            displayStatus('sendTextStatus', `Error: ${result}`, false);
+            console.error('ESP32 Router Response Error:', result);
         }
 
-        // Attach transmitter to the sendButton (assuming it's outside Quill's direct control)
-        document.getElementById('sendButton').addEventListener('click', transmitter);
+    } catch (error) {
+        displayStatus('sendTextStatus', `Network Error: Could not reach router. ${error.message}`, false);
+        console.error('Fetch failed:', error);
+    }
+}
 
-        // Load devices when the page loads
-        document.addEventListener('DOMContentLoaded', loadDevices);
-
+// cloudflare cmd: cloudflared tunnel run esp32-controller-tunnel
