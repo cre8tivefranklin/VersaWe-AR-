@@ -1,110 +1,146 @@
-
-
-const quill = new Quill('#editor', {
-  modules: {
-    toolbar: [
-      [{ header: [1, 2, false] }],
-      ['bold', 'italic', 'underline'],
-      ['image', 'code-block'],
-    ],
-  },
-  placeholder: 'Compose an epic...',
-  theme: 'snow', // or 'bubble'
-});
-
-// Import LLM app
-import {LLM} from "../../../js/llm.js/llm.js";
-
-// State variable to track model load status
-var model_loaded = false;
-
-// Initial Prompt
-var initial_prompt = "transmit js code to an ESP32 controller"
-
-// Callback functions
-const on_loaded = () => { 
-    model_loaded = true; 
-}
-const write_result = (text) => { document.getElementById('result').innerText += text + "\n" }
-const run_complete = () => {}
-
-// Configure LLM app
-const app = new LLM(
-     // Type of Model
-    'GGUF_CPU',
-
-    // Model URL
-    'https://huggingface.co/RichardErkhov/bigcode_-_tiny_starcoder_py-gguf/resolve/main/tiny_starcoder_py.Q8_0.gguf',
-
-    // Model Load callback function
-    on_loaded,          
-
-    // Model Result callback function
-    write_result,       
-
-     // On Model completion callback function
-    run_complete       
-);
-
-// Download & Load Model GGML bin file
-app.load_worker();
-
-// Trigger model once its loaded
-const checkInterval = setInterval(timer, 5000);
-
-function timer() {
-    if(model_loaded){
-            app.run({
-            prompt: initial_prompt,
-            top_k: 1
+// Initialize Quill editor
+        const quill = new Quill('#editor', {
+            theme: 'snow', // Or 'bubble'
+            placeholder: 'Type your message here...'
         });
-        clearInterval(checkInterval);
-    } else{
-        console.log('Waiting...')
-    }
-}
 
-function transmitter() {
-  let textElement = document.getElementById("editor");
-  let para_content = textElement.textContent;
+        // --- Configuration for the Central Router URL ---
+        // REPLACE THIS WITH YOUR CLOUDFLARE TUNNEL HOSTNAME FOR THE CENTRAL ROUTER
+        const centralRouterURL = "https://my-devices.versawear.org"; 
 
-  console.log(para_content);
+        // --- Helper Function to Display Status Messages ---
+        function displayStatus(elementId, message, isSuccess) {
+            const statusEl = document.getElementById(elementId);
+            statusEl.textContent = message;
+            statusEl.className = 'status-msg ' + (isSuccess ? 'success' : 'error');
+            setTimeout(() => {
+                statusEl.style.display = 'none'; // Hide after 5 seconds
+            }, 5000);
+        }
 
-  // --- CRUCIAL CHANGE HERE ---
-  // This is the public URL that Cloudflare Tunnel makes available for your ESP32
-  const esp32PublicUrl = "https://esp32.versawear.org"; // <--- Use the exact subdomain you chose in step 5
+        // --- Register New ESP32 Device ---
+        async function registerNewDevice() {
+            const deviceIdInput = document.getElementById('newDeviceId');
+            const localIpInput = document.getElementById('newLocalIp');
+            const deviceId = deviceIdInput.value.trim();
+            const localIp = localIpInput.value.trim();
 
-  const dataToSend = `message=${encodeURIComponent(para_content)}`;
+            if (!deviceId || !localIp) {
+                displayStatus('registerStatus', "Please enter both Device ID and Local IP.", false);
+                return;
+            }
 
-  console.log("Public URL: ", esp32PublicUrl);
-  console.log("Data Transmitted (body content): ", dataToSend);
+            try {
+                const response = await fetch(`${centralRouterURL}/register_device`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Flask expects JSON for this route
+                    },
+                    body: JSON.stringify({ device_id: deviceId, local_ip: localIp })
+                });
 
-  fetch(`${esp32PublicUrl}/submit_text`, { // Ensure this matches the 'path' in your config.yaml
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    body: dataToSend,
-  })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.text();
-  })
-  .then(data => console.log("ESP32 Response (via Cloudflare):", data))
-  .catch(error => {
-    console.error('Fetch failed (via Cloudflare Tunnel):', error);
-    // Inform the user if needed, and suggest checking the tunnel status
-    alert('Failed to send data to ESP32. Please ensure the Cloudflare Tunnel is running and your ESP32 is online. Error: ' + error.message);
-  });
-}
+                const data = await response.json();
+                if (response.ok) {
+                    displayStatus('registerStatus', `Success: ${data.message}`, true);
+                    deviceIdInput.value = ''; // Clear inputs
+                    localIpInput.value = '';
+                    loadDevices(); // Reload device list after registration
+                } else {
+                    displayStatus('registerStatus', `Error: ${data.error || 'Unknown error'}`, false);
+                }
+            } catch (error) {
+                displayStatus('registerStatus', `Network Error: Could not connect to router. ${error.message}`, false);
+                console.error('Registration fetch failed:', error);
+            }
+        }
 
-// To make this function run when the page loads, or based on an event:
-// For testing, you can call it directly:
-// transmitter(); 
+        // --- Load All Registered ESP32 Devices ---
+        async function loadDevices() {
+            const deviceListEl = document.getElementById('deviceList');
+            const selectDeviceIdEl = document.getElementById('selectDeviceId');
+            deviceListEl.innerHTML = ''; // Clear existing list
+            selectDeviceIdEl.innerHTML = '<option value="">Select a device...</option>'; // Reset dropdown
 
-// Or, ideally, attach it to a button click:
-document.getElementById("sendButton").addEventListener("click", transmitter);
+            try {
+                const response = await fetch(`${centralRouterURL}/devices`);
+                const devices = await response.json();
 
-// cloudflare cmd: cloudflared tunnel run esp32-controller-tunnel
+                if (Object.keys(devices).length === 0) {
+                    deviceListEl.innerHTML = '<li class="list-group-item text-muted">No devices registered yet.</li>';
+                    selectDeviceIdEl.innerHTML = '<option value="">No devices available</option>';
+                    return;
+                }
+
+                for (const deviceId in devices) {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+                    li.textContent = `${deviceId} (IP: ${devices[deviceId]})`;
+                    deviceListEl.appendChild(li);
+
+                    const option = document.createElement('option');
+                    option.value = deviceId;
+                    option.textContent = deviceId;
+                    selectDeviceIdEl.appendChild(option);
+                }
+            } catch (error) {
+                deviceListEl.innerHTML = '<li class="list-group-item text-danger">Failed to load devices. Check router.</li>';
+                selectDeviceIdEl.innerHTML = '<option value="">Error loading devices</option>';
+                console.error('Load devices fetch failed:', error);
+            }
+        }
+
+        // --- Send Text to Selected ESP32 Device ---
+        async function transmitter() {
+            const selectedDeviceId = document.getElementById('selectDeviceId').value;
+            if (!selectedDeviceId) {
+                displayStatus('sendTextStatus', "Please select a device to send text to.", false);
+                return;
+            }
+
+            const textEditorContent = quill.root.innerHTML; // Get HTML content from Quill
+            // You might want to get plain text, depending on ESP32 processing:
+            // const para_content = quill.getText().trim(); 
+            // For now, let's stick to the HTML content from Quill, or convert to plain text if needed.
+            const para_content = textEditorContent; // Use the HTML content
+
+            if (!para_content.trim()) {
+                displayStatus('sendTextStatus', "Please enter some text to send.", false);
+                return;
+            }
+
+            console.log(`Sending to device: ${selectedDeviceId}`);
+            console.log("Text content (Quill HTML):", para_content); // Log Quill's HTML content
+            
+            // The URL now includes the device_id as part of the path for the central router
+            const targetURL = `${centralRouterURL}/${selectedDeviceId}/submit_text`;
+            const dataToSend = `message=${encodeURIComponent(para_content)}`; 
+            
+            try {
+                const response = await fetch(targetURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: dataToSend,
+                });
+
+                const result = await response.text();
+                if (response.ok) {
+                    displayStatus('sendTextStatus', `Success: ${result}`, true);
+                } else {
+                    displayStatus('sendTextStatus', `Error: ${result}`, false);
+                    console.error('ESP32 Router Response Error:', result);
+                }
+
+            } catch (error) {
+                displayStatus('sendTextStatus', `Network Error: Could not reach router. ${error.message}`, false);
+                console.error('Fetch failed:', error);
+            }
+        }
+
+        // Attach transmitter to the sendButton (assuming it's outside Quill's direct control)
+        document.getElementById('sendButton').addEventListener('click', transmitter);
+
+        // Load devices when the page loads
+        document.addEventListener('DOMContentLoaded', loadDevices);
+

@@ -5,11 +5,30 @@ Prototype for VERSAWARE product
 IPO
 
 ----GET/INPUTS----
-    text_editor_input
-    
+    Dashboard_click
+    Settings_click
+        Input IP Address 
+        Input More IP ## This is nth IP ##
+        Input Register IP
+        Register_IP Click
+    Help_click
+    Quill_editor_inputs
+        Quill_ToolBar_btns
+        Quill_ToSEND
 ----GET/INPUTS----
 
 ----SET/PROCESSING----
+    IF Settings_click
+        THEN Open settingsMenu
+    ----SET_UI----
+        Set IP_list = [Input IP Address]
+        append IP Address TO IP_list
+        IF Input More IP
+            THEN IP_list
+        IF Register_IP Click
+            THEN sentTO_YAML IP_List[nth]
+
+
 ----SET/PROCESSING----
 
 ----SHOW/OUTPUTS----

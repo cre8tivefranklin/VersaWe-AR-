@@ -1,62 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Versa Wear(AR) - Web App Dashboard</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
-        <link rel="stylesheet" href="../../css/app.css">
-        <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet"/>
-        <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Versa Wear(AR) - Web App Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" xintegrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <!-- Assuming your app.css exists and is correctly linked -->
+    <link rel="stylesheet" href="../../css/app.css">
+    <!-- Only one Quill CSS link is needed -->
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
 
-    <body>
+    <style>
+        /* Custom styles for the new sections to fit your theme */
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
 
-        <div class="app-container">
-            <header class="app-header">
-                <div class="header-left">
-                    <h1 class="logo">VersaW(AR)e</h1>
-                </div>
-                <nav class="header-nav">
-                    <ul class="nav-list">
-                        <li class="nav-item"><a href="#" class="nav-link active" data-target="dashboard">Dashboard</a></li>
-                        <li class="nav-item"><a href="#" class="nav-link" data-target="settings">Settings</a></li>
-                        <li class="nav-item"><a href="#" class="nav-link" data-target="help">Help</a></li>
-                    </ul>
-                </nav>
-            </header>
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 0.75rem 1.25rem;
+            font-weight: bold;
+        }
 
-            <div class="app-grid">
-                <!-- TEXT EDITOR START -->
-                <div id="editor">
-                    <p>Type here</p>
-                </div>
-                <button id="sendButton"></button>
-                <!-- TEXT EDITOR END -->
+        .card-body {
+            padding: 1.25rem;
+        }
 
-                <!-- MODEL INFERENCE START -->
-                <pre>
-                    <div id="result"></code>
-                </pre>
-                <!-- MODEL INFERENCE END -->
+        .form-group label {
+            font-weight: 500;
+        }
+
+        .status-msg {
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin-top: 0.5rem;
+            display: none; /* Hidden by default */
+        }
+
+        .status-msg.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+            display: block;
+        }
+
+        .status-msg.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+            display: block;
+        }
+
+        #deviceList li {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        #deviceList li:last-child {
+            border-bottom: none;
+        }
+
+        /* Adjustments for the existing editor layout */
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns */
+            gap: 20px; /* Space between columns */
+            padding: 20px;
+            max-width: 1200px; /* Adjust as needed */
+            margin: 0 auto;
+        }
+
+        /* Styles for the Quill editor itself if needed */
+        #editor {
+            height: 200px; /* Give the editor a fixed height */
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="logo">VersaW(AR)e</h1>
             </div>
+            <nav class="header-nav">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="#" class="nav-link active" data-target="dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-target="settings">Settings</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-target="help">Help</a></li>
+                </ul>
+            </nav>
+        </header>
 
-            <footer class="app-footer">
-                <p>&copy; 2025 VersaW(AR)e. All rights reserved.</p>
-            </footer>
+        <div class="app-grid">
+            <!-- DEVICE MANAGEMENT START -->
+            <div class="card">
+                <div class="card-header">Manage ESP32 Devices</div>
+                <div class="card-body">
+                    <h5>Register New ESP32</h5>
+                    <div class="form-group">
+                        <label for="newDeviceId">Device ID (e.g., livingroom-tft):</label>
+                        <input type="text" class="form-control" id="newDeviceId" placeholder="Enter unique ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="newLocalIp">Local IP Address (e.g., 192.168.1.215):</label>
+                        <input type="text" class="form-control" id="newLocalIp" placeholder="Enter ESP32 local IP">
+                    </div>
+                    <button class="btn btn-primary btn-block" onclick="registerNewDevice()">Register Device</button>
+                    <div id="registerStatus" class="status-msg"></div>
+
+                    <h5 class="mt-4">Your Registered ESP32s</h5>
+                    <ul id="deviceList" class="list-group list-group-flush">
+                        <!-- Devices will be loaded here dynamically -->
+                        <li class="list-group-item text-muted">No devices registered yet.</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- DEVICE MANAGEMENT END -->
+
+            <!-- TEXT EDITOR & SENDER START -->
+            <div class="card">
+                <div class="card-header">Send Text to an ESP32 TFT</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="selectDeviceId">Select Device:</label>
+                        <select class="form-control" id="selectDeviceId">
+                            <option value="">Loading devices...</option>
+                            <!-- Options will be populated from registered devices -->
+                        </select>
+                    </div>
+
+                    <label for="editor">Text for TFT:</label>
+                    <!-- Quill Editor Container -->
+                    <div id="editor">
+                        <p>Type your message here</p>
+                    </div>
+                    <small class="form-text text-muted mb-3">Changes in this editor will be sent to the selected ESP32.</small>
+
+                    <button class="btn btn-success btn-block" id="sendButton" onclick="transmitter()">Send to Selected ESP32</button>
+                    <div id="sendTextStatus" class="status-msg"></div>
+                </div>
+            </div>
+            <!-- TEXT EDITOR & SENDER END -->
+
+            <!-- MODEL INFERENCE START (keeping existing structure) -->
+            <div class="card">
+                <div class="card-header">Model Inference Result</div>
+                <div class="card-body">
+                    <pre><code id="result">Waiting for inference...</code></pre>
+                </div>
+            </div>
+            <!-- MODEL INFERENCE END -->
 
         </div>
 
-    </body>
+        <footer class="app-footer">
+            <p>&copy; 2025 VersaW(AR)e. All rights reserved.</p>
+        </footer>
 
+    </div>
+
+    <!-- Bootstrap and jQuery (Quill depends on it, often included with Bootstrap) -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" xintegrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5u6vB8s" crossorigin="anonymous"></script>
+
+    <!-- Quill library -->
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+
+    <!-- Your existing bundle.js and script.js (if they are separate from this integration) -->
     <script src="../../dist/bundle.js"></script>
     <script type="module" src="../../js/script.js"></script>
-    <!-- Include the Quill library -->
-    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-    <!-- Initialize Quill editor -->
+
+</body>
 
 </html>
-
-
