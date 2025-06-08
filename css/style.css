@@ -12,6 +12,9 @@ body {
     margin: 0 auto;
     padding: 20px;
 }
+.container h2{
+     color: white;
+}
 
 .section {
     padding: 60px 0;
@@ -200,6 +203,20 @@ header nav ul li a:hover {
     background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.article{
+    color: black;
+    padding: 2.5%;
+    overflow-y: auto;
+}
+.article p{
+    text-indent: 10%;
+}
+.article a{
+    text-decoration: none;
+    color:#2980b9;
+    font-size: large;
+    font-weight: 100;
 }
 
 /* Features List */
