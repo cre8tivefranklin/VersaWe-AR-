@@ -225,6 +225,7 @@ header nav ul li a:hover {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 30px;
     margin-top: 30px;
+    color: black;
 }
 
 .features-list li {
@@ -251,6 +252,7 @@ header nav ul li a:hover {
     display: flex;
     flex-direction: column;
     gap: 15px;
+    color: black;
 }
 
 .contact-form input[type="text"],
