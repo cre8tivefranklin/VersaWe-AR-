@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,30 +14,549 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
 
     <style>
-        /* Custom CSS for the body to ensure full height and centering */
+        /* Absolute Brutalism - Global Reset & Base */
+        html,
         body {
             margin: 0;
-            /* overflow: hidden; */ /* Removed overflow hidden as it might interfere with overall page scroll */
-            /* display: flex; */ /* Removed as it might interfere with overall page layout */
-            /* justify-content: center; */
-            /* align-items: center; */
-            /* min-height: 100vh; */
-            background-color: #1a202c; /* Dark background from Tailwind's gray-900, can be overridden by style.css */
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto Mono', monospace, 'Segoe UI', sans-serif;
+            background-color: #000000;
+            color: #FFFFFF;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
         }
-        canvas {
-            display: block; /* Remove extra space below canvas */
-            /* P5.js will handle width/height for WEBGL based on createCanvas(windowWidth, windowHeight) */
+
+        /* Remove default list/link styles */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
-        /* Specific styling for the p5-container to ensure it fits within the product-details grid */
+
+        a {
+            text-decoration: none;
+            color: #00FFFF;
+            /* Aggressive tech blue */
+            transition: color 0.1s linear;
+        }
+
+        a:hover {
+            color: #80FFFF;
+            text-decoration: underline;
+            text-underline-offset: 5px;
+        }
+
+        /* Basic container for structure */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Header - A Solid Block */
+        header {
+            background-color: #1a1a1a;
+            border-bottom: 4px solid #00FFFF;
+            /* Thick, aggressive blue line */
+            padding: 1.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            flex-shrink: 0;
+        }
+
+        .logo img {
+            height: 5rem;
+            width: auto;
+            border: 2px solid #FFFFFF;
+            padding: 0.25rem;
+        }
+
+        nav {
+            flex-grow: 1;
+            text-align: right;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .nav-links li {
+            border: 1px solid #333333;
+            margin-left: -1px;
+        }
+
+        .nav-links li:first-child {
+            margin-left: 0;
+        }
+
+        .nav-links li a {
+            display: block;
+            padding: 1rem 1.5rem;
+            color: #FFFFFF;
+            background-color: #1a1a1a;
+            transition: background-color 0.1s linear, color 0.1s linear;
+        }
+
+        .nav-links li a:hover {
+            background-color: #00FFFF;
+            /* Blue highlight on hover */
+            color: #000000;
+            text-decoration: none;
+        }
+
+        /* Hero Section - Maximum Impact */
+        #hero {
+            padding: 6rem 0;
+            background-color: #1a1a1a;
+            border-bottom: 4px solid #00FFFF;
+        }
+
+        #hero .container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-content h1 {
+            font-size: 4.5rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #FFFFFF;
+            text-transform: uppercase;
+            letter-spacing: -4px;
+            margin-bottom: 1rem;
+            text-shadow: 4px 4px 0px #00FFFF;
+            /* Subtle brutalist text shadow */
+        }
+
+        .tagline {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #00FFFF;
+            /* Tagline in accent color */
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
+        }
+
+        .hero-image {
+            position: relative;
+            border: 4px solid #FFFFFF;
+            padding: 1rem;
+            background-color: #333333;
+        }
+
+        .hero-image img {
+            display: block;
+            width: 100%;
+            height: auto;
+            filter: grayscale(100%) contrast(150%);
+        }
+
+        /* Sections - Heavily Blocked */
+        .section {
+            padding: 5rem 0;
+            border-top: 4px solid #333333;
+            background-color: #0a0a0a;
+        }
+
+        .section:nth-of-type(even) {
+            background-color: #000000;
+        }
+
+        .section h2 {
+            font-size: 3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 2rem;
+            color: #FFFFFF;
+            border-bottom: 2px solid #00FFFF;
+            /* Underline for titles */
+            padding-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .section-intro {
+            font-size: 1.1rem;
+            color: #BBBBBB;
+            max-width: 900px;
+            margin-bottom: 3rem;
+            line-height: 1.8;
+        }
+
+        .section p {
+            color: #BBBBBB;
+            line-height: 1.8;
+        }
+
+        /* Product Details - Grid with explicit boundaries */
+        .product-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+        }
+
+        .detail-item {
+            border: 3px solid #FFFFFF;
+            background-color: #1a1a1a;
+            padding: 2.5rem;
+        }
+
+        .detail-item h3 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            color: #00FFFF;
+            /* Accent for subheadings */
+            border-bottom: 1px solid #555555;
+            padding-bottom: 0.5rem;
+        }
+
+        .detail-item sup {
+            color: #FFFFFF;
+        }
+
+        .article {
+            margin-top: 2rem;
+        }
+
+        .article h4 {
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            border-bottom: 1px dashed #555555;
+            padding-bottom: 0.5rem;
+        }
+
+        .article figure {
+            margin-top: 2rem;
+            border: 2px solid #555555;
+            padding: 0.5rem;
+            background-color: #0d0d0d;
+        }
+
+        .article figure img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: grayscale(50%);
+        }
+
+        .article figcaption {
+            font-size: 0.8rem;
+            text-align: right;
+            margin-top: 0.5rem;
+            color: #888888;
+            text-transform: uppercase;
+        }
+
+        /* Buttons - Hard, Unyielding Blocks */
+        .button {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background-color: #333333;
+            color: #FFFFFF;
+            border: 2px solid #FFFFFF;
+            border-radius: 0;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: background-color 0.1s linear, color 0.1s linear, border-color 0.1s linear;
+            cursor: pointer;
+        }
+
+        .button.primary {
+            background-color: #00FFFF;
+            /* Primary button is pure blue */
+            border-color: #00FFFF;
+            color: #000000;
+        }
+
+        .button:hover {
+            background-color: #555555;
+            border-color: #00FFFF;
+            color: #00FFFF;
+        }
+
+        .button.primary:hover {
+            background-color: #80FFFF;
+            border-color: #80FFFF;
+            color: #000000;
+        }
+
+        /* Features List - Grid of uniform blocks */
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            padding: 0;
+            margin: 0;
+        }
+
+        .features-list li {
+            border: 2px solid #555555;
+            background-color: #101010;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .features-list i.icon {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 1rem;
+            color: #00FFFF;
+            /* Icons in accent blue */
+            border: 1px solid #00FFFF;
+            padding: 0.25rem;
+            line-height: 1;
+        }
+
+        .features-list h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 0.75rem;
+            color: #FFFFFF;
+            border-bottom: 1px dashed #333333;
+            padding-bottom: 0.25rem;
+            width: 100%;
+        }
+
+        .features-list p {
+            font-size: 0.95rem;
+            color: #AAAAAA;
+        }
+
+        /* Vision Section */
+        #vision {
+            background-color: #1a1a1a;
+        }
+
+        /* Contact Form - Raw input fields */
+        .contact-form {
+            max-width: 600px;
+            margin: 0 auto;
+            border: 3px solid #FFFFFF;
+            padding: 2.5rem;
+            background-color: #1a1a1a;
+        }
+
+        .contact-form input,
+        .contact-form textarea {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background-color: #000000;
+            border: 1px solid #555555;
+            color: #00FFFF;
+            /* Blue input text */
+            margin-bottom: 1.5rem;
+            border-radius: 0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+        }
+
+        .contact-form input::placeholder,
+        .contact-form textarea::placeholder {
+            color: #888888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .contact-form button {
+            width: 100%;
+        }
+
+        /* Footer - A final solid block */
+        footer {
+            background-color: #1a1a1a;
+            border-top: 4px solid #00FFFF;
+            /* Mirror header border */
+            padding: 2rem 0;
+            text-align: center;
+            color: #888888;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* P5.js Container - The Core AR Display */
         #product .detail-item #p5-container {
             width: 100%;
-            height: 400px; /* Set a fixed height or use a responsive height unit */
+            height: 400px;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #2d3748; /* A slightly lighter dark background for the container */
-            border-radius: 0.5rem; /* Rounded corners */
-            overflow: hidden; /* Hide overflow if model is too large */
+            background-color: #000000;
+            border: 3px solid #00FFFF;
+            /* Aggressive blue border for focus */
+            overflow: hidden;
+            margin-top: 1.5rem;
+        }
+
+        /* P5.js loading text inside container */
+        #p5-container>div {
+            color: #00FFFF !important;
+            /* Force blue loading text */
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+
+        /* Mobile Specific Brutalism */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            header .container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .logo img {
+                height: 4rem;
+            }
+
+            nav {
+                width: 100%;
+                text-align: left;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .nav-links li {
+                width: 100%;
+                margin-left: 0;
+                border-top: 1px solid #333333;
+                border-bottom: none;
+            }
+
+            .nav-links li:last-child {
+                border-bottom: 1px solid #333333;
+            }
+
+            .nav-links li a {
+                padding: 0.75rem 1rem;
+                text-align: center;
+                background-color: #1a1a1a;
+            }
+
+            #hero {
+                padding: 4rem 0;
+            }
+
+            #hero .container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .hero-content h1 {
+                font-size: 3rem;
+                letter-spacing: -2px;
+                text-align: center;
+                text-shadow: 2px 2px 0px #00FFFF;
+            }
+
+            .tagline {
+                font-size: 1.2rem;
+                text-align: center;
+                margin-bottom: 1.5rem;
+            }
+
+            .hero-image {
+                display: none;
+            }
+
+            .hero-content .button {
+                width: 100%;
+                text-align: center;
+                margin-top: 1.5rem;
+            }
+
+            .section {
+                padding: 3rem 0;
+            }
+
+            .section h2 {
+                font-size: 2rem;
+                letter-spacing: 1px;
+                text-align: center;
+                display: block;
+                border-bottom: none;
+                margin-bottom: 1.5rem;
+            }
+
+            .section-intro,
+            .section p {
+                font-size: 0.95rem;
+                text-align: center;
+                margin-bottom: 1.5rem;
+            }
+
+            .product-details,
+            .features-list {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .detail-item {
+                padding: 1.5rem;
+            }
+
+            .detail-item h3 {
+                font-size: 1.4rem;
+                text-align: center;
+            }
+
+            #product .detail-item #p5-container {
+                height: 300px;
+            }
+
+            .features-list li {
+                padding: 1.5rem;
+                align-items: center;
+                text-align: center;
+            }
+
+            .features-list h3 {
+                font-size: 1.1rem;
+                width: auto;
+            }
+
+            .contact-form {
+                padding: 1.5rem;
+            }
         }
     </style>
 </head>
@@ -57,7 +576,7 @@
                     <li><a href="#vision">Vision</a></li>
                     <li><a href="#contact">Contact</a></li>
                     <li><a href="">Shop</a></li>
-                    <li><a href="app.html" target="_blank">VersaW(AR)e</a></li>
+                    <li><a href="app.html" target="_blank">VERS<sup>APP</sup></a></li>
                 </ul>
             </nav>
         </div>
@@ -81,17 +600,17 @@
 
         <section id="product" class="section">
             <div class="container">
-                <h2>Introducing VersaWe(AR)</h2>
-                <p class="section-intro">The future of data interaction is here. Our wearable AR glasses and intuitive web app work together to bring digital insights into your reality.</p>
+                <h2>Transform Your Workflow</h2>
+                <p class="section-intro">Transform the way you see data. Our wearable AR glasses and web app bring digital insights directly into your real-world view, making complex information instantly accessible and intuitive.</p>
                 <div class="product-details grid-2">
                     <div class="detail-item">
-                        <h3>The VersaWe(AR)<sup>L</sup></h3>
-                        <p>Lightweight, comfortable glasses with advanced lens technology for a clear and stable augmented reality display.</p>
+                        <h3>The VERS<sup>L</sup></h3>
+                        <p>Your world, augmented. These glasses are designed for all-day wear. They're lightweight, comfortable, and feature state-of-the-art lenses that provide a clear and steady augmented reality view.</p>
                         <!-- STL display goes here -->
                         <div id="p5-container">
-                        <!-- The P5.js canvas will be appended here by the sketch -->
+                            <!-- The P5.js canvas will be appended here by the sketch -->
                         </div>
-                        
+
                     </div>
                     <div class="detail-item">
                         <h3>Intuitive Web Interface</h3>
@@ -99,26 +618,15 @@
                             <h4>How It Works</h4>
                             <article>
                                 <p>
-                                    It's simple!
+                                    The VersaWe(AR) app (aka VERS<sup>APP</sup>) serves as your central dashboard. It connects to your VERS<sup>L</sup> glasses and syncs a real-time text editor, creating an extra screen for coding, writing, or any task. This intuitive interface boosts cognitive function and makes work feel effortless.
                                 </p>
-                                <br>
-                                <p>
-                                    The <a href = "app.html" target="_blank">VersaW(AR)e app</a> is essentially a dashboard that can register the IP address of the VersaWe(AR)<sup>L</sup> in session. 
+                                <figure>
+                                    <img src="../../css/ex.png" alt="VersaWe(AR) Logo" class="h-15 w-auto">
+                                    <figcaption><a href="app.html" target="_blank">VERS<sup>APP</sup></a></figcaption>
+                                </figure>
+
                                 </p>
-                                <br>
-                                <p>
-                                    With that, comes a text editor. The data from the editor is transmitted to the VersaWe(AR)<sup>L</sup>. This enables users to have an extra window/layer of visually interfacing with their work. Ideal for coders, software engineers, and writers!
-                                </p>
-                                <br>
-                                <p>
-                                    Moreover, such interfacing boosts cognitive function and reduces the overall burden of the work due to the intuitive interfacing.
-                                    <figure>
-                                        <img src="../../css/ex.png" alt="VersaWe(AR) Logo" class="h-15 w-auto">
-                                        <figcaption><a href = "app.html" target="_blank">VersaW(AR)e</a></figcaption>
-                                    </figure>
-                                    
-                                </p>
-                                
+
                             </article>
                         </div>
                     </div>
@@ -158,7 +666,8 @@
                     <li>
                         <i class="icon">💡</i>
                         <h3>Enhanced Understanding</h3>
-                        <p>Gain deeper insights by visualizing data in its real-world context. Or AI-Powered inferencing. </p>
+                        <p>Gain deeper insights by visualizing data in its real-world context. Or AI-Powered
+                            inferencing. </p>
                     </li>
                 </ul>
             </div>
@@ -167,8 +676,11 @@
         <section id="vision" class="section">
             <div class="container">
                 <h2>Our Vision</h2>
-                <p class="section-intro">We envision a world where information is seamlessly integrated with our daily lives, empowering individuals with knowledge at their fingertips, or rather, in their sight. Most of all, a world where augmented reality is not overly expensive and difficult to access.</p>
-                <p>VersaWe(AR) is our step towards making augmented reality a practical and transformative tool for everyone, enhancing understanding and interaction with the world around us.</p>
+                <p class="section-intro">We envision a world where information is seamlessly integrated with our daily
+                    lives, empowering individuals with knowledge at their fingertips, or rather, in their sight. Most of
+                    all, a world where augmented reality is not overly expensive and difficult to access.</p>
+                <p>VersaWe(AR) is our step towards making augmented reality a practical and transformative tool for
+                    everyone, enhancing understanding and interaction with the world around us.</p>
             </div>
         </section>
 
@@ -193,14 +705,14 @@
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const menuToggle = document.querySelector('.menu-toggle');
             const nav = document.querySelector('header nav');
 
             // Find all list items (li) within the nav and then their anchor (a) tags
-            const navLinks = nav.querySelectorAll('ul li a'); 
+            const navLinks = nav.querySelectorAll('ul li a');
 
-            menuToggle.addEventListener('click', function() {
+            menuToggle.addEventListener('click', function () {
                 nav.classList.toggle('active');
                 menuToggle.classList.toggle('active');
             });
@@ -225,7 +737,7 @@
             // If your HTML is at 'versawear.org/app/public/app.html'
             // and your STL is at 'versawear.org/js/draft_01.stl',
             // then the path is correct.
-            loadModel('../../js/draft_01.stl', true, 
+            loadModel('../../js/draft_01.stl', true,
                 // Success callback
                 (model) => {
                     myModel = model;
@@ -306,11 +818,11 @@
                 // Optionally display a loading message or error if model not loaded
                 // This will draw text in 2D mode temporarily
                 push(); // Save current 3D transformations
-                translate(-width/2, -height/2, 0); // Move to 2D screen coordinates
+                translate(-width / 2, -height / 2, 0); // Move to 2D screen coordinates
                 fill(255); // White text
                 textSize(20);
                 textAlign(CENTER, CENTER);
-                text("Loading model...", width/2, height/2);
+                text("Loading model...", width / 2, height / 2);
                 pop(); // Restore 3D transformations
             }
 
@@ -318,4 +830,5 @@
         }
     </script>
 </body>
+
 </html>

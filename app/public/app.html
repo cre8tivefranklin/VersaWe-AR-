@@ -5,180 +5,502 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Versa Wear(AR) - Web App Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" xintegrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
-    <!-- Assuming your app.css exists and is correctly linked -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
     <link rel="stylesheet" href="../../css/app.css">
-    <!-- Only one Quill CSS link is needed -->
     <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2.2/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.5/dist/blazeface.min.js"></script>
 
     <style>
-        /* Custom styles for the new sections to fit your theme */
+        /* Absolute Brutalism - Global Reset & Base */
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            /* Crucial for brutalism: borders don't add to element size */
+            font-family: 'Roboto Mono', monospace, 'Segoe UI', sans-serif;
+            /* Prioritize monospaced */
+            background-color: #000000;
+            /* Absolute black background */
+            color: #FFFFFF;
+            /* Stark white text */
+            line-height: 1.6;
+            /* Ensure readability */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* General Layout and Typography */
+        .app-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-family: 'Roboto Mono', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Header - A Solid Block */
+        .app-header {
+            background-color: #1a1a1a;
+            border-bottom: 4px solid #00FFFF;
+            padding: 1.5rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            box-shadow: none;
+            /* Override any soft shadows */
+        }
+
+        .logo {
+            color: #00FFFF;
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: -2px;
+        }
+
+        .nav-list {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-link {
+            color: #FFFFFF;
+            text-transform: uppercase;
+            font-weight: 700;
+            padding: 0.5rem 1rem;
+            transition: all 0.1s linear;
+            border: 2px solid transparent;
+            margin-left: -2px;
+            /* Overlap borders */
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: #000000;
+            background-color: #00FFFF;
+            border-color: #00FFFF;
+            text-decoration: none;
+        }
+
+        .nav-item:first-child .nav-link {
+            margin-left: 0;
+        }
+
+        /* Card - The Core Brutalist Element */
         .card {
-            border: 1px solid #e0e0e0;
-            border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            background-color: #1a1a1a;
+            border: 2px solid #FFFFFF;
+            border-radius: 0;
+            box-shadow: 4px 4px 0px #00FFFF;
+            /* Hard, offset shadow */
+            margin-bottom: 2rem;
+            overflow: hidden;
         }
 
         .card-header {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-            padding: 0.75rem 1.25rem;
+            background-color: #333333;
+            /* Darker header block */
+            border-bottom: 2px solid #555555;
+            padding: 1rem 1.5rem;
             font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #FFFFFF;
         }
 
         .card-body {
-            padding: 1.25rem;
+            padding: 1.5rem;
         }
 
+        /* Form Elements - Minimalist and Functional */
         .form-group label {
+            color: #FFFFFF;
             font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9rem;
         }
 
+        .form-control,
+        .form-control:focus,
+        #selectDeviceId {
+            background-color: #000000;
+            border: 1px solid #555555;
+            color: #00FFFF;
+            border-radius: 0;
+            transition: border-color 0.1s linear;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        .form-control::placeholder {
+            color: #888888;
+            text-transform: uppercase;
+        }
+
+        .btn {
+            border-radius: 0;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.1s linear;
+            border: 2px solid;
+        }
+
+        .btn-primary {
+            background-color: #333333;
+            border-color: #FFFFFF;
+            color: #FFFFFF;
+        }
+
+        .btn-primary:hover {
+            background-color: #555555;
+            border-color: #00FFFF;
+            color: #00FFFF;
+        }
+
+        .btn-success {
+            background-color: #00FFFF;
+            border-color: #00FFFF;
+            color: #000000;
+        }
+
+        .btn-success:hover {
+            background-color: #00FFFF;
+            border-color: #00ffffb9;
+        }
+
+        /* Status Messages */
         .status-msg {
-            padding: 0.5rem;
-            border-radius: 0.25rem;
-            margin-top: 0.5rem;
-            display: none; /* Hidden by default */
+            border-radius: 0;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .status-msg.success {
-            background-color: #d4edda;
-            color: #155724;
-            border-color: #c3e6cb;
-            display: block;
+            background-color: #002200;
+            color: #00FFFF;
+            border: 2px solid #00FFFF;
         }
 
         .status-msg.error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border-color: #f5c6cb;
-            display: block;
+            background-color: #3b1d22;
+            color: #f85149;
+            border: 2px solid #f85149;
         }
 
-        #deviceList li {
-            padding: 0.5rem 0;
-            border-bottom: 1px dashed #eee;
+        /* List group */
+        .list-group-item {
+            background-color: #1a1a1a;
+            border-color: #555555;
+            color: #FFFFFF;
+            border-radius: 0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            padding: 1rem 1.5rem;
         }
 
-        #deviceList li:last-child {
+        /* Quill Terminal Styling - A Brutalist Overhaul */
+        .ql-toolbar.ql-snow {
+            background-color: #0a0a0a;
+            border: 2px solid #555555;
             border-bottom: none;
+            padding: 0.5rem;
         }
 
-        /* Adjustments for the existing editor layout */
-        .app-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr; /* Two columns */
-            gap: 20px; /* Space between columns */
-            padding: 20px;
-            max-width: 1200px; /* Adjust as needed */
-            margin: 0 auto;
+        .ql-toolbar.ql-snow .ql-formats {
+            margin-right: 0.5rem;
         }
 
-        /* Styles for the Quill editor itself if needed */
-        #editor {
-            height: 200px; /* Give the editor a fixed height */
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 0.25rem;
+        .ql-toolbar.ql-snow button {
+            border: 1px solid transparent;
+            border-radius: 0;
+            background-color: transparent;
+            padding: 0.5rem;
+        }
+
+        .ql-toolbar.ql-snow button:hover {
+            background-color: #1a1a1a;
+            border-color: #00FFFF;
+        }
+
+        .ql-toolbar.ql-snow button.ql-active {
+            background-color: #00FFFF;
+            color: #000000;
+        }
+
+        .ql-toolbar.ql-snow .ql-stroke {
+            fill: none;
+            stroke: #FFFFFF;
+            transition: stroke 0.1s linear;
+        }
+
+        .ql-toolbar.ql-snow button:hover .ql-stroke {
+            stroke: #00FFFF;
+        }
+
+        .ql-toolbar.ql-snow button.ql-active .ql-stroke {
+            stroke: #000000;
+        }
+
+        .ql-toolbar.ql-snow .ql-fill {
+            fill: #FFFFFF;
+            transition: fill 0.1s linear;
+        }
+
+        .ql-toolbar.ql-snow button:hover .ql-fill {
+            fill: #00FFFF;
+        }
+
+        .ql-toolbar.ql-snow button.ql-active .ql-fill {
+            fill: #000000;
+        }
+
+        .ql-container.ql-snow {
+            background-color: #000000;
+            border: 2px solid #555555;
+            color: #00FFFF;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .ql-editor {
+            min-height: 250px;
+            cursor: text;
+        }
+
+        .ql-editor p {
+            margin-bottom: 0;
+        }
+
+        .ql-editor h1,
+        .ql-editor h2,
+        .ql-editor h3,
+        .ql-editor h4,
+        .ql-editor h5,
+        .ql-editor h6 {
+            color: #FFFFFF;
+            font-weight: 700;
+            text-transform: uppercase;
+            border-bottom: 1px solid #555555;
+            padding-bottom: 0.25rem;
+            margin-top: 1.5rem;
+        }
+
+        .ql-editor blockquote {
+            border-left: 2px solid #555555;
+            margin-left: 0;
+            padding-left: 1rem;
+            font-style: italic;
+            color: #AAAAAA;
+        }
+
+        .ql-editor pre {
+            background-color: #1a1a1a;
+            color: #FFFFFF;
+            border: 1px solid #555555;
+            border-radius: 0;
+            padding: 1rem;
+        }
+
+        /* Disable some features to simplify the terminal feel */
+        .ql-toolbar.ql-snow .ql-list,
+        .ql-toolbar.ql-snow .ql-indent,
+        .ql-toolbar.ql-snow .ql-direction {
+            display: none;
+        }
+
+        .ql-editor.ql-blank::before {
+            display: none;
+        }
+
+        /* Chart Canvas */
+        #liveChart {
+            background-color: #000000;
+            border: 2px solid #555555;
+            box-shadow: none;
+            /* Override card shadow */
+        }
+
+        /* Footer */
+        .app-footer {
+            background-color: #1a1a1a;
+            border-top: 4px solid #00FFFF;
+            padding: 2rem 0;
+            text-align: center;
+            color: #888888;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 768px) {
+            .app-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .nav-list {
+                flex-direction: column;
+                width: 100%;
+                margin-top: 1rem;
+            }
+
+            .nav-item {
+                width: 100%;
+                border-bottom: 1px solid #555555;
+            }
+
+            .nav-item:first-child .nav-link {
+                margin-left: 0;
+            }
+
+            .nav-link {
+                display: block;
+                text-align: center;
+                border-bottom: none;
+                border: none;
+                margin-left: 0;
+                padding: 0.75rem;
+            }
+
+            .logo {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
         }
     </style>
 </head>
 
-<body>
+<body class="body">
 
     <div class="app-container">
         <header class="app-header">
             <div class="header-left">
-                <h1 class="logo">VersaW(AR)e</h1>
+                <h1 class="logo">Vers<sup>APP</sup></h1>
             </div>
             <nav class="header-nav">
                 <ul class="nav-list">
                     <li class="nav-item"><a href="#" class="nav-link active" data-target="dashboard">Dashboard</a></li>
-                    <!-- <li class="nav-item"><a href="#" class="nav-link" data-target="settings">Settings</a></li> -->
                     <li class="nav-item"><a href="#" class="nav-link" data-target="help">Help</a></li>
                 </ul>
             </nav>
         </header>
 
-        <div >
-            <!-- DEVICE MANAGEMENT START -->
-            <div class="card">
-                <div class="card-header">Manage Devices</div>
-                <div class="card-body">
-                    <h5>Register New Device</h5>
-                    <div class="form-group">
-                        <label for="newDeviceId">Device ID (e.g., livingroom-tft):</label>
-                        <input type="text" class="form-control" id="newDeviceId" placeholder="Enter unique ID">
-                    </div>
-                    <div class="form-group">
-                        <label for="newLocalIp">Local IP Address (e.g., 192.168.1.215):</label>
-                        <input type="text" class="form-control" id="newLocalIp" placeholder="Enter Device  IP">
-                    </div>
-                    <button class="btn btn-primary btn-block" onclick="registerNewDevice()">Register Device</button>
-                    <div id="registerStatus" class="status-msg"></div>
-
-                    <h5 class="mt-4">Your Registered Devices</h5>
-                    <ul id="deviceList" class="list-group list-group-flush">
-                        <!-- Devices will be loaded here dynamically -->
-                        <li class="list-group-item text-muted">No devices registered yet.</li>
-                    </ul>
+        <div class="card">
+            <div class="card-header">Manage Devices</div>
+            <div class="card-body">
+                <h5>Register New Device</h5>
+                <div class="form-group">
+                    <label for="newDeviceId">Device ID (e.g., livingroom-tft):</label>
+                    <input type="text" class="form-control" id="newDeviceId" placeholder="Enter unique ID">
                 </div>
-            </div>
-            <!-- DEVICE MANAGEMENT END -->
-
-            <!-- TEXT EDITOR & SENDER START -->
-            <div class="card">
-                <div class="card-header">Send Text to a device</div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label for="selectDeviceId">Select Device:</label>
-                        <select class="form-control" id="selectDeviceId">
-                            <option value="">Loading devices...</option>
-                            <!-- Options will be populated from registered devices -->
-                        </select>
-                    </div>
-
-                    <label for="editor">Text for Device:</label>
-                    <!-- Quill Editor Container -->
-                    <div id="editor">
-                        <p>Type your message here</p>
-                    </div>
-                    <small class="form-text text-muted mb-3">Changes in this editor will be sent to the selected Device.</small>
-
-                    <button class="btn btn-success btn-block" id="sendButton" onclick="transmitter()">Send to Selected Device</button>
-                    <div id="sendTextStatus" class="status-msg"></div>
+                <div class="form-group">
+                    <label for="newLocalIp">Local IP Address (e.g., 192.168.1.215):</label>
+                    <input type="text" class="form-control" id="newLocalIp" placeholder="Enter Device IP">
                 </div>
-            </div>
-            <!-- TEXT EDITOR & SENDER END -->
+                <button class="btn btn-primary btn-block" id="registerButton">Register Device</button>
+                <div id="registerStatus" class="status-msg"></div>
 
-            <!-- MODEL INFERENCE START (keeping existing structure) -->
-            <div class="card">
-                <div class="card-header">Model Inference Result</div>
-                <div class="card-body">
-                    <pre><code id="result">Waiting for inference...</code></pre>
-                </div>
+                <h5 class="mt-4">Your Registered Devices</h5>
+                <ul id="deviceList" class="list-group list-group-flush">
+                    <li class="list-group-item text-muted">No devices registered yet.</li>
+                </ul>
             </div>
-            <!-- MODEL INFERENCE END -->
-
         </div>
+        <div class="card">
+            <div class="card-header">Communication</div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="selectDeviceId">Select Device:</label>
+                    <select class="form-control" id="selectDeviceId">
+                        <option value="">Loading devices...</option>
+                    </select>
+                </div>
 
+                <label for="editor">Text for Device: </label>
+                <div id="editor"></div>
+                <small class="form-text text-muted mb-3">Changes in this editor will be sent to the selected
+                    Device.</small>
+
+                <!-- <button class="btn btn-success btn-block" id="infMech">LLM Inference</button> -->
+                <button class="btn btn-success btn-block" id="sendButton">Send to
+                    Selected Device</button>
+                <div id="sendTextStatus" class="status-msg"></div>
+            </div>
+        </div>
+        <!-- <div class="card result_card">
+            ---ARBITRARY FOR NOW, WILL REINSTATE LATER---
+            <div>Model Inference Result</div>
+            <div class="card-body">
+                <p id="result"></p>
+            </div>
+        </div> -->
+
+        <!-- <div class="card" id="camera-vision-card">
+
+            ---ARBITRARY FOR NOW, WILL REINSTATE LATER---
+
+            <div class="card-header">Computer Vision</div>
+            <div class="card-body">
+                <div class="camera-container">
+                    <video id="liveCameraFeed" autoplay playsinline></video>
+                    <canvas id="thermalCanvas"></canvas>
+                    <canvas id="processingCanvas" style="display: none;"></canvas>
+                </div>
+                <p id="smartVisionOutput" class="text-center font-weight-bold"></p>
+                <div class="d-flex justify-content-center mt-3 flex-wrap">
+                    <div class="d-flex justify-content-center mt-3 flex-wrap">
+                        <button class="btn btn-primary mx-2 my-1" id="startCameraButton">Start Camera & Graph</button>
+                        <button class="btn btn-primary mx-2 my-1" id="smartVisionToggleBtn">Turn Smart Vision
+                            On</button>
+                        <button class="btn btn-primary mx-2 my-1" id="cameraToggleButton">Turn Camera Off</button>
+                        <button class="btn btn-info mx-2 my-1" id="thermalFilterButton">Thermal Filter</button>
+                        <button class="btn btn-info mx-2 my-1" id="gridFilterButton">Grid Filter</button>
+                    </div>
+                </div>
+            </div>
+        </div> -->
+
+        <!-- GRAPHING -->
+        <!-- <div class="card">
+            <div class="card-header">Live Data Graph</div>
+            <div class="card-body">
+                <canvas id="liveChart"></canvas>
+            </div>
+        </div> -->
         <footer class="app-footer">
             <p>&copy; 2025 VersaW(AR)e. All rights reserved.</p>
         </footer>
 
     </div>
 
-    <!-- Bootstrap and jQuery (Quill depends on it, often included with Bootstrap) -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" xintegrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5u6vB8s" crossorigin="anonymous"></script>
-
-    <!-- Quill library -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-
-    <!-- Your existing bundle.js and script.js (if they are separate from this integration) -->
     <script src="../../dist/bundle.js"></script>
-    <script src="../../js/script.js"></script>
+
+    <script type="module" src="../../js/data_handler.js"></script>
+    <script type="module" src="../../js/camera.js"></script>
 
 </body>
 

@@ -1,32 +1,50 @@
 /* Custom CSS provided by the user, adapted for Tailwind compatibility */
 /* width */
+.body{
+    background-color: #007bff7a;
+}
+.ql-editor, .ql-toolbar  {
+    background-color: #007bff;
+    color: white;
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    font-weight: bold;
+}
+
 ::-webkit-scrollbar {
-  width: 2.5px;
+    width: 2.5px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #007bff;
+    background: #007bff;
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: white;
+    background: white;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #007bff;
+    background: #007bff;
 }
+
 body {
-    font-family: 'Inter', sans-serif; /* Using Inter font */
+    font-family: 'Inter', sans-serif;
+    /* Using Inter font */
     line-height: 1.6;
     background-color: #f4f6f9;
     color: #333;
 }
 
 /* Resetting default browser styles for consistency */
-body, h1, h2, p, ul, li {
+body,
+h1,
+h2,
+p,
+ul,
+li {
     margin: 0;
     padding: 0;
 }
@@ -37,21 +55,39 @@ body, h1, h2, p, ul, li {
     padding: 1rem;
 }
 
-.app-grid{
-    flex-direction: row;
+/* Adjustments for the existing editor layout */
+.app-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Two columns */
+    gap: 20px;
+    /* Space between columns */
+    padding: 20px;
+    max-width: 1200px;
+    /* Adjust as needed */
+    margin: 0 auto;
 }
-#result{
-    position: fixed;
-    display: none;
-    top: 0px;
-    right: 25%;
-    width: 50%;
-    height: 50%;
-    color: white;
+
+.result_card {
     background-color: #007bff;
-    overflow-y: auto;
-    overflow-x: hidden;
-    text-align: left;
+    color: white;
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    font-weight: bold;
+}
+
+.result_head {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 0.75rem 1.25rem;
+    font-weight: bold;
+}
+
+
+#result {
+    position: relative;
+    /* z-index: 11; */
+    color: white;
+    padding: 1rem;
 }
 
 /* Header */
@@ -62,9 +98,12 @@ body, h1, h2, p, ul, li {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 0;
-    border-radius: 0.5rem; /* Added rounded corners */
-    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.05); /* Added shadow */
-    margin-bottom: 1rem; /* Added margin-bottom */
+    border-radius: 0.5rem;
+    /* Added rounded corners */
+    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.05);
+    /* Added shadow */
+    margin-bottom: 1rem;
+    /* Added margin-bottom */
 }
 
 .header-left {
@@ -76,7 +115,8 @@ body, h1, h2, p, ul, li {
     font-size: 1.5rem;
     margin-right: 1rem;
     color: #007bff;
-    padding-left: 1rem; /* Added padding */
+    padding-left: 1rem;
+    /* Added padding */
 }
 
 .nav-list {
@@ -93,7 +133,8 @@ body, h1, h2, p, ul, li {
     color: #333;
     padding: 0.5rem 1rem;
     border-radius: 0.25rem;
-    transition: background-color 0.3s ease; /* Added transition */
+    transition: background-color 0.3s ease;
+    /* Added transition */
 }
 
 .nav-link:hover {
@@ -130,7 +171,8 @@ body, h1, h2, p, ul, li {
 .upload-area {
     display: flex;
     align-items: center;
-    flex-wrap: wrap; /* Added flex-wrap for responsiveness */
+    flex-wrap: wrap;
+    /* Added flex-wrap for responsiveness */
 }
 
 .input-file {
@@ -145,7 +187,8 @@ body, h1, h2, p, ul, li {
     border-radius: 0.25rem;
     cursor: pointer;
     margin-right: 1rem;
-    transition: background-color 0.3s ease; /* Added transition */
+    transition: background-color 0.3s ease;
+    /* Added transition */
 }
 
 .upload-button:hover {
@@ -160,7 +203,8 @@ body, h1, h2, p, ul, li {
     border-radius: 0.25rem;
     cursor: pointer;
     font-size: 1rem;
-    transition: background-color 0.3s ease; /* Added transition */
+    transition: background-color 0.3s ease;
+    /* Added transition */
 }
 
 .button:hover {
@@ -187,7 +231,8 @@ body, h1, h2, p, ul, li {
     margin-top: 0.5rem;
     background-color: #f9f9f9;
     border-radius: 0.25rem;
-    min-height: 100px; /* Added min-height */
+    min-height: 100px;
+    /* Added min-height */
 }
 
 /* AR Controls */
@@ -233,9 +278,12 @@ body, h1, h2, p, ul, li {
     border-top: 1px solid #e0e0e0;
     font-size: 0.875rem;
     color: #777;
-    border-radius: 0.5rem; /* Added rounded corners */
-    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.05); /* Added shadow */
-    margin-top: 1rem; /* Added margin-top */
+    border-radius: 0.5rem;
+    /* Added rounded corners */
+    box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.05);
+    /* Added shadow */
+    margin-top: 1rem;
+    /* Added margin-top */
 }
 
 /* Message Box Styling */
@@ -250,7 +298,8 @@ body, h1, h2, p, ul, li {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    display: none; /* Hidden by default */
+    display: none;
+    /* Hidden by default */
 }
 
 .message-box {
@@ -288,6 +337,11 @@ body, h1, h2, p, ul, li {
     background-color: #0056b3;
 }
 
+#sendButton,
+#infMech {
+    background-color: #007bff;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .app-header {
@@ -323,7 +377,8 @@ body, h1, h2, p, ul, li {
         align-items: stretch;
     }
 
-    .upload-button, .button {
+    .upload-button,
+    .button {
         width: 100%;
         margin-right: 0;
         margin-bottom: 0.5rem;

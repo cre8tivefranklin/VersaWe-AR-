@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Versa Wear(AR) - Web App Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" xintegrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <!-- Assuming your app.css exists and is correctly linked -->
+    <link rel="stylesheet" href="../../css/app.css">
+    <!-- Only one Quill CSS link is needed -->
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+
+    <style>
+        /* Custom styles for the new sections to fit your theme */
+        .card {
+            border: 1px solid #e0e0e0;
+            border- radius: 0.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 0.75rem 1.25rem;
+            font-weight: bold;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+        }
+
+        .status-msg {
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin-top: 0.5rem;
+            display: none; /* Hidden by default */
+        }
+
+        .status-msg.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+            display: block;
+        }
+
+        .status-msg.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+            display: block;
+        }
+
+        #deviceList li {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        #deviceList li:last-child {
+            border-bottom: none;
+        }
+
+        /* Adjustments for the existing editor layout */
+        .app-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* Two columns */
+            gap: 20px; /* Space between columns */
+            padding: 20px;
+            max-width: 1200px; /* Adjust as needed */
+            margin: 0 auto;
+        }
+
+        /* Styles for the Quill editor itself if needed */
+        #editor {
+            height: 200px; /* Give the editor a fixed height */
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="logo">VersaW(AR)e</h1>
+            </div>
+            <nav class="header-nav">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="#" class="nav-link active" data-target="dashboard">Dashboard</a></li>
+                    <!-- <li class="nav-item"><a href="#" class="nav-link" data-target="settings">Settings</a></li> -->
+                    <li class="nav-item"><a href="#" class="nav-link" data-target="help">Help</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div >
+            <!-- DEVICE MANAGEMENT START -->
+            <div class="card">
+                <div class="card-header">Manage Devices</div>
+                <div class="card-body">
+                    <h5>Register New Device</h5>
+                    <div class="form-group">
+                        <label for="newDeviceId">Device ID (e.g., livingroom-tft):</label>
+                        <input type="text" class="form-control" id="newDeviceId" placeholder="Enter unique ID">
+                    </div>
+                    <div class="form-group">
+                        <label for="newLocalIp">Local IP Address (e.g., 192.168.1.215):</label>
+                        <input type="text" class="form-control" id="newLocalIp" placeholder="Enter Device  IP">
+                    </div>
+                    <button class="btn btn-primary btn-block" onclick="registerNewDevice()">Register Device</button>
+                    <div id="registerStatus" class="status-msg"></div>
+
+                    <h5 class="mt-4">Your Registered Devices</h5>
+                    <ul id="deviceList" class="list-group list-group-flush">
+                        <!-- Devices will be loaded here dynamically -->
+                        <li class="list-group-item text-muted">No devices registered yet.</li>
+                    </ul>
+                </div>
+            </div>
+            <!-- DEVICE MANAGEMENT END -->
+
+            <!-- TEXT EDITOR & SENDER START -->
+            <div class="card">
+                <div class="card-header">Send Text to a device</div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="selectDeviceId">Select Device:</label>
+                        <select class="form-control" id="selectDeviceId">
+                            <option value="">Loading devices...</option>
+                            <!-- Options will be populated from registered devices -->
+                        </select>
+                    </div>
+
+                    <label for="editor">Text for Device:</label>
+                    <!-- Quill Editor Container -->
+                    <div id="editor">
+                        <p>Type your message here</p>
+                    </div>
+                    <small class="form-text text-muted mb-3">Changes in this editor will be sent to the selected Device.</small>
+
+                    <button class="btn btn-success btn-block" id="infMech">LLM Inference</button>
+                    <button class="btn btn-success btn-block" id="sendButton" onclick="transmitter()">Send to Selected Device</button>
+                    <div id="sendTextStatus" class="status-msg"></div>
+                </div>
+            </div>
+            <!-- TEXT EDITOR & SENDER END -->
+
+            <!-- MODEL INFERENCE START (keeping existing structure) -->
+            <div class="card">
+                <div class="card-header">Model Inference Result</div>
+                <div class="card-body">
+                    <pre><code id="result">Waiting for inference...</code></pre>
+                </div>
+            </div>
+            <!-- MODEL INFERENCE END -->
+
+        </div>
+
+        <footer class="app-footer">
+            <p>&copy; 2025 VersaW(AR)e. All rights reserved.</p>
+        </footer>
+
+    </div>
+
+    <!-- Bootstrap and jQuery (Quill depends on it, often included with Bootstrap) -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" xintegrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5u6vB8s" crossorigin="anonymous"></script>
+
+    <!-- Quill library -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+
+    <!-- Your existing bundle.js and script.js (if they are separate from this integration) -->
+    <script type="module" src="../../dist/bundle.js"></script>
+    <!-- <script type="module" src="../../js/script.js"></script> -->
+
+</body>
+
+</html>
+
+// Initialize WebLLM (This must be a module)
+import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
+console.log("WebLLM loaded successfully!");
+
+const quill = new Quill('#editor', {
+    theme: 'snow', // Or 'bubble'
+    placeholder: 'Type your message here...'
+});
+async function inferenceMechanism() {
+    const initProgressCallback = (progress) => {
+        console.log("Model loading progress:", progress);
+    };
+    const engine = await CreateMLCEngine("Llama-3-8B-Instruct-q4f32_1-MLC", { initProgressCallback });
+    console.log("MLC Engine created:", engine);
+}
+function getEditorContent() {
+    const plainText = quill.getText();
+    const htmlContent = quill.root.innerHTML;
+    console.log("Plain Text:", plainText);
+    console.log("HTML Content:", htmlContent)
+    inferenceMechanism()
+    return plainText; // Return plain text for further processing
+}
+document.addEventListener("DOMContentLoaded", () => {
+    // Other initializations like Quill here...
+    const infMech = document.getElementById("infMech");
+    if (infMech) {
+        // Use an event listener to call the function
+        infMech.addEventListener("click", getEditorContent);
+    }
+});
+
+// --- Configuration for the Central Router URL ---
+// REPLACE THIS WITH YOUR CLOUDFLARE TUNNEL HOSTNAME FOR THE CENTRAL ROUTER
+const centralRouterURL = "https://my-devices.versawear.org";
+
+// --- Helper Function to Display Status Messages ---
+function displayStatus(elementId, message, isSuccess) {
+    const statusEl = document.getElementById(elementId);
+    statusEl.textContent = message;
+    statusEl.className = 'status-msg ' + (isSuccess ? 'success' : 'error');
+    setTimeout(() => {
+        statusEl.style.display = 'none'; // Hide after 5 seconds
+    }, 5000);
+}
+
+// --- Register New ESP32 Device ---
+async function registerNewDevice() {
+    const deviceIdInput = document.getElementById('newDeviceId');
+    const localIpInput = document.getElementById('newLocalIp');
+    const deviceId = deviceIdInput.value.trim();
+    const localIp = localIpInput.value.trim();
+
+    if (!deviceId || !localIp) {
+        displayStatus('registerStatus', "Please enter both Device ID and Local IP.", false);
+        return;
+    }
+
+    try {
+        const response = await fetch(`${centralRouterURL}/register_device`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Flask expects JSON for this route
+            },
+            body: JSON.stringify({ device_id: deviceId, local_ip: localIp })
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+            displayStatus('registerStatus', `Success: ${data.message}`, true);
+            deviceIdInput.value = ''; // Clear inputs
+            localIpInput.value = '';
+            loadDevices(); // Reload device list after registration
+        } else {
+            displayStatus('registerStatus', `Error: ${data.error || 'Unknown error'}`, false);
+        }
+    } catch (error) {
+        displayStatus('registerStatus', `Network Error: Could not connect to router. ${error.message}`, false);
+        console.error('Registration fetch failed:', error);
+    }
+}
+
+// --- Load All Registered ESP32 Devices ---
+async function loadDevices() {
+    const deviceListEl = document.getElementById('deviceList');
+    const selectDeviceIdEl = document.getElementById('selectDeviceId');
+    deviceListEl.innerHTML = ''; // Clear existing list
+    selectDeviceIdEl.innerHTML = '<option value="">Select a device...</option>'; // Reset dropdown
+
+    try {
+        const response = await fetch(`${centralRouterURL}/devices`);
+        const devices = await response.json();
+
+        if (Object.keys(devices).length === 0) {
+            deviceListEl.innerHTML = '<li class="list-group-item text-muted">No devices registered yet.</li>';
+            selectDeviceIdEl.innerHTML = '<option value="">No devices available</option>';
+            return;
+        }
+
+        for (const deviceId in devices) {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.textContent = `${deviceId} (IP: ${devices[deviceId]})`;
+            deviceListEl.appendChild(li);
+
+            const option = document.createElement('option');
+            option.value = deviceId;
+            option.textContent = deviceId;
+            selectDeviceIdEl.appendChild(option);
+        }
+    } catch (error) {
+        deviceListEl.innerHTML = '<li class="list-group-item text-danger">Failed to load devices. Check router.</li>';
+        selectDeviceIdEl.innerHTML = '<option value="">Error loading devices</option>';
+        console.error('Load devices fetch failed:', error);
+    }
+}
+
+// --- Send Text to Selected ESP32 Device ---
+async function transmitter() {
+    const selectedDeviceId = document.getElementById('selectDeviceId').value;
+    if (!selectedDeviceId) {
+        displayStatus('sendTextStatus', "Please select a device to send text to.", false);
+        return;
+    }
+
+    // --- CHANGE THIS LINE TO GET PLAIN TEXT ---
+    const para_content = quill.getText().trim();
+    // .getText() gets the plain text content.
+    // .trim() removes any leading/trailing whitespace, including a potential newline Quill might add.
+
+    if (!para_content) { // Changed condition to check for empty string after trim
+        displayStatus('sendTextStatus', "Please enter some text to send.", false);
+        return;
+    }
+
+    console.log(`Sending to device: ${selectedDeviceId}`);
+    console.log("Text content (Plain Text):", para_content); // Updated console log
+
+    const targetURL = `${centralRouterURL}/${selectedDeviceId}/submit_text`;
+    const dataToSend = `message=${encodeURIComponent(para_content)}`;
+
+    try {
+        const response = await fetch(targetURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: dataToSend,
+        });
+
+        const result = await response.text();
+        if (response.ok) {
+            displayStatus('sendTextStatus', `Success: ${result}`, true);
+        } else {
+            displayStatus('sendTextStatus', `Error: ${result}`, false);
+            console.error('ESP32 Router Response Error:', result);
+        }
+
+    } catch (error) {
+        displayStatus('sendTextStatus', `Network Error: Could not reach router. ${error.message}`, false);
+        console.error('Fetch failed:', error);
+    }
+}
+
+
+// cloudflare cmd: cloudflared tunnel run esp32-controller-tunnel

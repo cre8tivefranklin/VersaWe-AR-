@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Augmented Reality For All</title>
+    <link rel="stylesheet" href="../../css/style.css">
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- P5.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.min.js"></script>
+    <!-- P5.js Sound (optional, but often included) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+
+    <style>
+        /* Custom CSS for the body to ensure full height and centering */
+        body {
+            margin: 0;
+            /* overflow: hidden; */ /* Removed overflow hidden as it might interfere with overall page scroll */
+            /* display: flex; */ /* Removed as it might interfere with overall page layout */
+            /* justify-content: center; */
+            /* align-items: center; */
+            /* min-height: 100vh; */
+            background-color: #1a202c; /* Dark background from Tailwind's gray-900, can be overridden by style.css */
+        }
+        canvas {
+            display: block; /* Remove extra space below canvas */
+            /* P5.js will handle width/height for WEBGL based on createCanvas(windowWidth, windowHeight) */
+        }
+        /* Specific styling for the p5-container to ensure it fits within the product-details grid */
+        #product .detail-item #p5-container {
+            width: 100%;
+            height: 400px; /* Set a fixed height or use a responsive height unit */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #2d3748; /* A slightly lighter dark background for the container */
+            border-radius: 0.5rem; /* Rounded corners */
+            overflow: hidden; /* Hide overflow if model is too large */
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white font-sans">
+
+    <header>
+        <div class="container">
+            <div class="logo menu-toggle">
+                <!-- Added Tailwind classes h-12 and w-auto for explicit sizing -->
+                <img src="../../css/Logo_fin.png" alt="VersaWe(AR) Logo" class="h-12 w-auto">
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#product">Product</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#vision">Vision</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="">Shop</a></li>
+                    <li><a href="app.html" target="_blank">VersaW(AR)e</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Augmented Reality For All</h1>
+                    <p class="tagline">Is Our Mission</p>
+                    <a href="#product" class="button primary">Learn More</a>
+                </div>
+                <div class="hero-image">
+                    <figure>
+                        <img src="../../css/image.png" alt="VersaWe(AR) in use">
+                    </figure>
+                </div>
+            </div>
+        </section>
+
+        <section id="product" class="section">
+            <div class="container">
+                <h2>Introducing VersaWe(AR)</h2>
+                <p class="section-intro">The future of data interaction is here. Our wearable AR glasses and intuitive web app work together to bring digital insights into your reality.</p>
+                <div class="product-details grid-2">
+                    <div class="detail-item">
+                        <h3>The VersaWe(AR)<sup>L</sup></h3>
+                        <p>Lightweight, comfortable glasses with advanced lens technology for a clear and stable augmented reality display.</p>
+                        <!-- STL display goes here -->
+                        <div id="p5-container">
+                        <!-- The P5.js canvas will be appended here by the sketch -->
+                        </div>
+                        
+                    </div>
+                    <div class="detail-item">
+                        <h3>Intuitive Web Interface</h3>
+                        <div class="article">
+                            <h4>How It Works</h4>
+                            <article>
+                                <p>
+                                    It's simple!
+                                </p>
+                                <br>
+                                <p>
+                                    The <a href = "app.html" target="_blank">VersaW(AR)e app</a> is essentially a dashboard that can register the IP address of the VersaWe(AR)<sup>L</sup> in session. 
+                                </p>
+                                <br>
+                                <p>
+                                    With that, comes a text editor. The data from the editor is transmitted to the VersaWe(AR)<sup>L</sup>. This enables users to have an extra window/layer of visually interfacing with their work. Ideal for coders, software engineers, and writers!
+                                </p>
+                                <br>
+                                <p>
+                                    Moreover, such interfacing boosts cognitive function and reduces the overall burden of the work due to the intuitive interfacing.
+                                    <figure>
+                                        <img src="../../css/ex.png" alt="VersaWe(AR) Logo" class="h-15 w-auto">
+                                        <figcaption><a href = "app.html" target="_blank">VersaW(AR)e</a></figcaption>
+                                    </figure>
+                                    
+                                </p>
+                                
+                            </article>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="section bg-light">
+            <div class="container">
+                <h2>Key Features & Benefits</h2>
+                <ul class="features-list grid-3">
+                    <li>
+                        <i class="icon">✨</i>
+                        <h3>Interactive Data Exploration</h3>
+                        <p>Manipulate and engage with data directly within your physical environment.</p>
+                    </li>
+                    <li>
+                        <i class="icon">🌐</i>
+                        <h3>Real-World Integration</h3>
+                        <p>Overlay relevant online information onto the objects and spaces around you.</p>
+                    </li>
+                    <li>
+                        <i class="icon">⚙️</i>
+                        <h3>Customizable Display</h3>
+                        <p>Tailor the data you see and how it's presented through the web interface.</p>
+                    </li>
+                    <li>
+                        <i class="icon">👓</i>
+                        <h3>Clear Visual Projection</h3>
+                        <p>Experience a sharp and easy-to-understand augmented reality overlay.</p>
+                    </li>
+                    <li>
+                        <i class="icon">📡</i>
+                        <h3>Seamless Connectivity</h3>
+                        <p>Reliable wireless connection via Wi-Fi for real-time data updates.</p>
+                    </li>
+                    <li>
+                        <i class="icon">💡</i>
+                        <h3>Enhanced Understanding</h3>
+                        <p>Gain deeper insights by visualizing data in its real-world context. Or AI-Powered inferencing. </p>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="vision" class="section">
+            <div class="container">
+                <h2>Our Vision</h2>
+                <p class="section-intro">We envision a world where information is seamlessly integrated with our daily lives, empowering individuals with knowledge at their fingertips, or rather, in their sight. Most of all, a world where augmented reality is not overly expensive and difficult to access.</p>
+                <p>VersaWe(AR) is our step towards making augmented reality a practical and transformative tool for everyone, enhancing understanding and interaction with the world around us.</p>
+            </div>
+        </section>
+
+        <section id="contact" class="section bg-light">
+            <div class="container">
+                <h2>Contact Us</h2>
+                <p class="section-intro">We'd love to hear from you! Send us your questions, feedback, or inquiries.</p>
+                <form class="contact-form" action="emailer.php" method="POST">
+                    <input type="text" placeholder="Your Name">
+                    <input type="email" placeholder="Your Email">
+                    <textarea placeholder="Your Message"></textarea>
+                    <button type="submit" class="button primary">Send Message</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 VersaWe(AR). All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const nav = document.querySelector('header nav');
+
+            // Find all list items (li) within the nav and then their anchor (a) tags
+            const navLinks = nav.querySelectorAll('ul li a'); 
+
+            menuToggle.addEventListener('click', function() {
+                nav.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+            });
+
+            // Close menu when a link is clicked
+            navLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    nav.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                });
+            });
+        });
+
+        // Global variable to hold the loaded 3D model
+        let myModel;
+
+        // --- P5.js Preload Function ---
+        // This function is called before setup, used to load external assets.
+        function preload() {
+            // Load the STL model. The 'true' argument indicates it's a 3D model.
+            // IMPORTANT: The path below is RELATIVE to the HTML file.
+            // If your HTML is at 'versawear.org/app/public/app.html'
+            // and your STL is at 'versawear.org/js/draft_01.stl',
+            // then the path is correct.
+            loadModel('../../js/draft_01.stl', true, 
+                // Success callback
+                (model) => {
+                    myModel = model;
+                    console.log("Model loaded successfully!");
+                },
+                // Error callback
+                (error) => {
+                    console.error("Failed to load model:", error);
+                    // You might want to display a message on the canvas or page here
+                }
+            );
+        }
+
+        // --- P5.js Setup Function ---
+        // This function is called once when the sketch starts.
+        function setup() {
+            // Create a WebGL canvas and append it to the 'p5-container' div.
+            // This ensures the canvas is placed within your desired layout.
+            const p5Container = document.getElementById('p5-container');
+            // Ensure p5Container exists before creating canvas
+            if (p5Container) {
+                const canvas = createCanvas(p5Container.offsetWidth, p5Container.offsetHeight, WEBGL);
+                canvas.parent('p5-container'); // Attach the canvas to the div
+            } else {
+                // Fallback if container not found, create canvas in body
+                const canvas = createCanvas(windowWidth, windowHeight, WEBGL);
+                canvas.parent(document.body); // Attach to body if container not found
+                console.warn("P5.js container '#p5-container' not found. Canvas appended to body.");
+            }
+
+
+            // Set up a default camera view.
+            camera(0, 0, (height / 2) / tan(PI / 6), 0, 0, 0, 0, 1, 0);
+
+            // Prevent right-click context menu and default mouse down behavior.
+            // document.oncontextmenu = function() { return false; };
+            // document.onmousedown = function() { return false; };
+
+            // Attach a resize listener to ensure the canvas resizes with its container or window
+            window.addEventListener('resize', () => {
+                // If the container's size changes, resize the canvas to match
+                const p5Container = document.getElementById('p5-container'); // Re-get container on resize
+                if (p5Container) {
+                    resizeCanvas(p5Container.offsetWidth, p5Container.offsetHeight);
+                } else {
+                    // Fallback to window size if container not found (less ideal for specific layouts)
+                    resizeCanvas(windowWidth, windowHeight);
+                }
+                camera(0, 0, (height / 2) / tan(PI / 6), 0, 0, 0, 0, 1, 0);
+            });
+        }
+
+        // --- P5.js Draw Function ---
+        // This function is called repeatedly (default 60 times per second).
+        function draw() {
+            background(100); // Set the background color (a dark gray).
+
+            // Add basic lighting to make the 3D model visible.
+            // Without light, 3D objects in WEBGL mode appear flat or invisible.
+            ambientLight(60); // Soft ambient light
+            directionalLight(255, 255, 255, 0, 0, -1); // White light from front
+
+            // Map mouse X and Y positions to rotation angles.
+            let angleX = map(mouseY, 0, height, -PI, PI);
+            let angleY = map(mouseX, 0, width, -PI, PI);
+
+            push(); // Save the current drawing style and transformations.
+
+            scale(0.6); // Scale down the model.
+
+            rotateX(angleX);
+            rotateY(angleY);
+
+            // Only attempt to display the model if it has been loaded successfully
+            if (myModel) {
+                model(myModel); // Display the loaded 3D model.
+            } else {
+                // Optionally display a loading message or error if model not loaded
+                // This will draw text in 2D mode temporarily
+                push(); // Save current 3D transformations
+                translate(-width/2, -height/2, 0); // Move to 2D screen coordinates
+                fill(255); // White text
+                textSize(20);
+                textAlign(CENTER, CENTER);
+                text("Loading model...", width/2, height/2);
+                pop(); // Restore 3D transformations
+            }
+
+            pop(); // Restore the previous drawing style and transformations.
+        }
+    </script>
+</body>
+</html>

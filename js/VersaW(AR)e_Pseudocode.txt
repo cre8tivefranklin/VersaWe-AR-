@@ -1,35 +1,69 @@
 Frank Sami
 Prototype for VERSAWARE product 
-5/30/2025
+9/4/2025
 
 IPO
-
 ----GET/INPUTS----
-    Dashboard_click
-    Settings_click
-        Input IP Address 
-        Input More IP ## This is nth IP ##
-        Input Register IP
-        Register_IP Click
-    Help_click
-    Quill_editor_inputs
-        Quill_ToolBar_btns
-        Quill_ToSEND
+    allCameraData
+    infData
+    externalCamera
+    dataToSend
+    colorConcentrationCamData
+    dataSequesteration
+    sequesteredColorConcentrationCamData
+    sequesteredInfData
+    dataToBeAnalyzed
+    dataToSave
+    formattingOfSequesteration
 ----GET/INPUTS----
 
 ----SET/PROCESSING----
-    IF Settings_click
-        THEN Open settingsMenu
-    ----SET_UI----
-        Set IP_list = [Input IP Address]
-        append IP Address TO IP_list
-        IF Input More IP
-            THEN IP_list
-        IF Register_IP Click
-            THEN sentTO_YAML IP_List[nth]
+    allCameraData = [getFrameData(), runThermalFilter()]
+    data_set_ofInfMech = inferenceMechanism() //reply tokens
+    dataToSave = [allCameraData, data_set_ofInfMech]
 
-
+    //color concentration calculations
+    sequesteredColorConcentrationCamData = [allCameraData[1][0], allCameraData[1][1], allCameraData[1][2]];
+    red = (sequesteredColorConcentrationCamData[0]/(sum(sequesteredColorConcentrationCamData)) )
+    green = (sequesteredColorConcentrationCamData[1]/(sum(sequesteredColorConcentrationCamData)) )
+    blue = (sequesteredColorConcentrationCamData[2]/(sum(sequesteredColorConcentrationCamData)) )
+        
+    //color collection
+    colorConcentrationCamData = {
+        Red:red;
+        Green:green;
+        Blue:blue;
+    };
+    sequesteredInfData = {
+        userPrompt:data_set_ofInfMech[0];
+        WebLLMResponse:data_set_ofInfMech[1];        
+    };
+    dataSequesteration = {
+        Prompts:sequesteredInfData[userPrompt]
+        Inferences:sequesteredInfData[WebLLMResponse];
+        Tokens:data_set_ofInfMech[0];
+        colorConcentrations:colorConcentrationCamData[Blue];
+    };
+    x = dataSequesteration[Prompts];
+    y = dataSequesteration[Inferences];
+    z = dataSequesteration[Tokens];
+    w = dataSequesteration[colorConcentrations]
+    formattingOfSequesteration(X,Y,Z,W) {
+        //formatting of rows and columns
+        columns_aka_yAxis = ["User Prompts", "Inferences","Token Usage", "Blue Concentration"]
+        rows_aka_xAxis = [" "]
+        rows_aka_xAxis.push(X)
+        rows_aka_xAxis.push(Y)
+        rows_aka_xAxis.push(Z)
+        rows_aka_xAxis.push(W)   
+        xy = [columns_aka_yAxis, rows_aka_xAxis]
+        return xy
+    }
 ----SET/PROCESSING----
 
 ----SHOW/OUTPUTS----
+generate_livegraph_chartjs(){
+    chartdata = formattingOfSequesteration(x, y, z, w)
+    create live graph with x and y data;
+}
 ----SHOW/OUTPUTS----

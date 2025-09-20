@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Versa Wear(AR) - Web App Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <link rel="stylesheet" href="../../css/app.css">
+    <link href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.2.2/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface@0.0.5/dist/blazeface.min.js"></script>
+
+    <style>
+        /* Custom styles for the new sections to fit your theme */
+        .card {
+            border: 1px solid #e0e0e0;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            padding: 0.75rem 1.25rem;
+            font-weight: bold;
+        }
+
+        .card-body {
+            padding: 1.25rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+        }
+
+        .status-msg {
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            margin-top: 0.5rem;
+            display: none;
+            /* Hidden by default */
+        }
+
+        .status-msg.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+            display: block;
+        }
+
+        .status-msg.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+            display: block;
+        }
+
+        #deviceList li {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #eee;
+        }
+
+        #deviceList li:last-child {
+            border-bottom: none;
+        }
+
+        /* Styles for the Quill editor itself if needed */
+        #editor {
+            height: 200px;
+            /* Give the editor a fixed height */
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 0.25rem;
+        }
+
+        /* Styles for the new camera section */
+        #camera-vision-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .camera-container {
+            position: relative;
+            width: 100%;
+            max-width: 640px;
+            height: 480px;
+            background-color: #000;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            /* To keep video/canvas inside bounds */
+        }
+
+        #liveCameraFeed,
+        #thermalCanvas {
+            /* Changed from #filteredCanvas to #thermalCanvas */
+            position: absolute;
+            /* Position absolute to overlay */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            /* Scale content to fit */
+        }
+
+        #processingCanvas {
+            display: none;
+            /* Hide the processing canvas */
+        }
+    </style>
+</head>
+
+<body class="body">
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-left">
+                <h1 class="logo">VersaW(AR)e</h1>
+            </div>
+            <nav class="header-nav">
+                <ul class="nav-list">
+                    <li class="nav-item"><a href="#" class="nav-link active" data-target="dashboard">Dashboard</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link" data-target="help">Help</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="card">
+            <div class="card-header">Manage Devices</div>
+            <div class="card-body">
+                <h5>Register New Device</h5>
+                <div class="form-group">
+                    <label for="newDeviceId">Device ID (e.g., livingroom-tft):</label>
+                    <input type="text" class="form-control" id="newDeviceId" placeholder="Enter unique ID">
+                </div>
+                <div class="form-group">
+                    <label for="newLocalIp">Local IP Address (e.g., 192.168.1.215):</label>
+                    <input type="text" class="form-control" id="newLocalIp" placeholder="Enter Device IP">
+                </div>
+                <button class="btn btn-primary btn-block" id="registerButton">Register Device</button>
+                <div id="registerStatus" class="status-msg"></div>
+
+                <h5 class="mt-4">Your Registered Devices</h5>
+                <ul id="deviceList" class="list-group list-group-flush">
+                    <li class="list-group-item text-muted">No devices registered yet.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">Send Text to a device</div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="selectDeviceId">Select Device:</label>
+                    <select class="form-control" id="selectDeviceId">
+                        <option value="">Loading devices...</option>
+                    </select>
+                </div>
+
+                <label for="editor">Text for Device: </label>
+                <div id="editor"></div>
+                <small class="form-text text-muted mb-3">Changes in this editor will be sent to the selected
+                    Device.</small>
+
+                <button class="btn btn-success btn-block" id="infMech">LLM Inference</button>
+                <button class="btn btn-success btn-block" id="sendButton">Send to
+                    Selected Device</button>
+                <div id="sendTextStatus" class="status-msg"></div>
+            </div>
+        </div>
+        <div class="card result_card">
+            <div>Model Inference Result</div>
+            <div class="card-body">
+                <p id="result"></p>
+            </div>
+        </div>
+        <div class="card" id="camera-vision-card">
+            <div class="card-header">Computer Vision</div>
+            <div class="card-body">
+                <div class="camera-container">
+                    <video id="liveCameraFeed" autoplay playsinline></video>
+                    <canvas id="thermalCanvas"></canvas>
+                    <canvas id="processingCanvas" style="display: none;"></canvas>
+                </div>
+                <p id="smartVisionOutput" class="text-center font-weight-bold"></p>
+                <div class="d-flex justify-content-center mt-3 flex-wrap">
+                    <div class="d-flex justify-content-center mt-3 flex-wrap">
+                        <button class="btn btn-primary mx-2 my-1" id="startCameraButton">Start Camera & Graph</button>
+                        <button class="btn btn-primary mx-2 my-1" id="smartVisionToggleBtn">Turn Smart Vision
+                            On</button>
+                        <button class="btn btn-primary mx-2 my-1" id="cameraToggleButton">Turn Camera Off</button>
+                        <button class="btn btn-info mx-2 my-1" id="thermalFilterButton">Thermal Filter</button>
+                        <button class="btn btn-info mx-2 my-1" id="gridFilterButton">Grid Filter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">Live Data Graph</div>
+            <div class="card-body">
+                <canvas id="liveChart"></canvas>
+            </div>
+        </div>
+        <footer class="app-footer">
+            <p>&copy; 2025 VersaW(AR)e. All rights reserved.</p>
+        </footer>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <script src="../../dist/bundle.js"></script>
+
+    <script type="module"  src="../../js/data_handler.js"></script>
+    <script type="module"  src="../../js/camera.js"></script>
+
+</body>
+
+</html>
