@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frank Sami | Vers - Link Hub</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        stark: {
+                            0: '#ffffff',
+                            50: '#f9f9f9',
+                            100: '#f0f0f0',
+                            200: '#e0e0e0',
+                            300: '#cccccc',
+                            400: '#999999',
+                            500: '#666666',
+                            700: '#333333',
+                            800: '#1a1a1a',
+                            900: '#111111',
+                            1000: '#000000'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Client-side QRCode JS library for offline subway generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+            -webkit-font-smoothing: antialiased;
+            touch-action: manipulation;
+        }
+
+        /* High-contrast black & white card interactions */
+        .stark-card {
+            background-color: #ffffff;
+            border: 2px solid #000000;
+            color: #000000;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .stark-card:hover, .stark-card:active {
+            background-color: #000000;
+            color: #ffffff !important;
+            transform: translateY(-2px);
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        .stark-card:hover .stark-subtext,
+        .stark-card:hover .stark-icon {
+            color: #ffffff !important;
+        }
+
+        .stark-button-primary {
+            background-color: #000000;
+            color: #ffffff;
+            border: 2px solid #000000;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .stark-button-primary:hover {
+            background-color: #ffffff;
+            color: #000000;
+            box-shadow: 4px 4px 0px #000000;
+        }
+
+        /* Stark dot grid background */
+        .grid-bg {
+            background-image: radial-gradient(#000000 0.75px, transparent 0.75px);
+            background-size: 16px 16px;
+        }
+
+        .modal-blur {
+            backdrop-filter: blur(4px);
+        }
+
+        /* Monochrome filter applied to IG embed frame */
+        .ig-frame-container {
+            border: 2px solid #000000;
+            background-color: #ffffff;
+            box-shadow: 4px 4px 0px #000000;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ig-frame-container iframe {
+            width: 100%;
+            height: 480px;
+            border: none;
+            background-color: #ffffff;
+            filter: grayscale(100%) contrast(105%);
+            transition: filter 0.3s ease;
+        }
+
+        .ig-frame-container:hover iframe {
+            filter: grayscale(0%);
+        }
+    </style>
+</head>
+<body class="grid-bg min-h-screen flex flex-col items-center justify-between px-4 py-8 relative selection:bg-black selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="w-full max-w-md flex justify-between items-center mb-8 bg-stark-0 border-2 border-stark-1000 p-3 shadow-[4px_4px_0px_#000000]">
+        <div class="text-[11px] font-mono font-bold tracking-widest text-stark-1000 uppercase">
+            FRANK SAMI // VERS
+        </div>
+        <button id="qrOpenBtn" aria-label="Open Offline QR Code" class="px-3 py-1 text-xs font-mono font-bold bg-stark-1000 text-stark-0 hover:bg-stark-0 hover:text-stark-1000 border-2 border-stark-1000 transition-colors flex items-center space-x-2">
+            <i class="fa-solid fa-qrcode text-sm"></i>
+            <span>QR</span>
+        </button>
+    </header>
+
+    <main class="w-full max-w-md flex-1 flex flex-col items-center">
+
+        <!-- Profile Bio Header -->
+        <section class="text-center w-full mb-8 bg-stark-0 border-2 border-stark-1000 p-6 shadow-[4px_4px_0px_#000000]">
+            <div class="mb-4 inline-block">
+                <div class="w-20 h-20 bg-stark-1000 text-stark-0 border-2 border-stark-1000 flex items-center justify-center font-mono font-black text-2xl tracking-tighter">
+                    FS
+                </div>
+            </div>
+            <h1 class="text-2xl font-black tracking-tight uppercase text-stark-1000 mb-1">
+                Frank Sami <span class="text-stark-500 font-light">/ Vers</span>
+            </h1>
+            <p class="text-xs font-mono font-bold text-stark-700 uppercase tracking-widest mb-2">
+                Sketches & Visual Research
+            </p>
+            <p class="text-xs text-stark-800 max-w-xs mx-auto leading-relaxed font-mono">
+                Direct mobile patronage & live Instagram feed preview.
+            </p>
+        </section>
+
+        <!-- Direct Payment Support Section -->
+        <section class="w-full mb-8">
+            <div class="flex items-center justify-between mb-3 border-b-2 border-stark-1000 pb-1">
+                <span class="text-[11px] font-mono font-bold uppercase tracking-widest text-stark-1000">
+                    Direct Support
+                </span>
+                <span class="text-[10px] font-mono text-stark-600 uppercase font-bold">
+                    OPENS APP DIRECTLY
+                </span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <!-- Cash App ($VFSami) -->
+                <a href="https://cash.app/$VFSami" target="_blank" rel="noopener noreferrer" class="stark-card p-4 flex flex-col justify-between h-24 group relative">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold font-mono text-stark-1000 uppercase">CASH APP</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs text-stark-500 stark-icon"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold font-mono text-stark-1000 tracking-tight">
+                            $VFSami
+                        </div>
+                        <div class="text-[10px] font-mono text-stark-500 stark-subtext">
+                            Tap to send payment
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Venmo (@Frank-Sami) -->
+                <a href="https://venmo.com/u/Frank-Sami" target="_blank" rel="noopener noreferrer" class="stark-card p-4 flex flex-col justify-between h-24 group relative">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold font-mono text-stark-1000 uppercase">VENMO</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs text-stark-500 stark-icon"></i>
+                    </div>
+                    <div>
+                        <div class="text-sm font-bold font-mono text-stark-1000 tracking-tight">
+                            @Frank-Sami
+                        </div>
+                        <div class="text-[10px] font-mono text-stark-500 stark-subtext">
+                            Tap to send payment
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Live Instagram Profile Embed Section -->
+        <section class="w-full mb-10">
+            <div class="flex items-center justify-between mb-3 border-b-2 border-stark-1000 pb-1">
+                <span class="text-[11px] font-mono font-bold uppercase tracking-widest text-stark-1000">
+                    Instagram Live Preview
+                </span>
+                <span class="text-[10px] font-mono text-stark-600 uppercase font-bold">
+                    @frank_sami_vers
+                </span>
+            </div>
+
+            <!-- Frame wrapper holding the live Instagram embed iframe -->
+            <div class="ig-frame-container mb-3">
+                <iframe 
+                    src="https://www.instagram.com/frank_sami_vers/embed/" 
+                    title="Frank Sami Vers Live Instagram Profile" 
+                    scrolling="no" 
+                    allowtransparency="true" 
+                    loading="lazy">
+                </iframe>
+            </div>
+
+            <!-- Direct Instagram Profile Action Button -->
+            <a href="https://www.instagram.com/frank_sami_vers" target="_blank" rel="noopener noreferrer" class="w-full stark-card p-3 flex items-center justify-between group text-left">
+                <div class="flex items-center space-x-2.5">
+                    <i class="fa-brands fa-instagram text-base text-stark-1000 stark-icon"></i>
+                    <span class="text-xs font-mono font-bold uppercase tracking-wider text-stark-1000">OPEN @FRANK_SAMI_VERS IN INSTAGRAM</span>
+                </div>
+                <i class="fa-solid fa-arrow-right text-xs text-stark-500 stark-icon group-hover:translate-x-1 transition-transform"></i>
+            </a>
+        </section>
+
+    </main>
+
+    <!-- Page Footer -->
+    <footer class="w-full max-w-md text-center border-t-2 border-stark-1000 pt-6">
+        <div class="text-[11px] font-mono text-stark-1000 font-bold tracking-wider uppercase">
+            FRANK SAMI / VERS © <span id="year">2026</span>
+        </div>
+    </footer>
+
+    <!-- Fullscreen Offline QR Code Modal -->
+    <div id="qrModal" class="fixed inset-0 bg-stark-1000/90 modal-blur z-50 hidden flex flex-col items-center justify-between p-6">
+        <div class="w-full max-w-md flex justify-between items-center bg-stark-0 border-2 border-stark-1000 p-3 shadow-[4px_4px_0px_#000000]">
+            <span class="text-xs font-mono font-bold uppercase tracking-widest text-stark-1000">OFFLINE QR SCAN</span>
+            <button id="qrCloseBtn" class="p-1 text-stark-1000 hover:bg-stark-1000 hover:text-stark-0 transition-colors">
+                <i class="fa-solid fa-xmark text-lg px-1"></i>
+            </button>
+        </div>
+
+        <div class="flex flex-col items-center my-auto text-center bg-stark-0 border-2 border-stark-1000 p-8 shadow-[8px_8px_0px_#000000] max-w-xs w-full">
+            <div class="p-4 bg-stark-0 border-2 border-stark-1000 mb-4 inline-block">
+                <!-- Client-side QRCode engine container -->
+                <div id="qrcode" class="flex justify-center items-center"></div>
+            </div>
+            <div class="font-mono text-sm font-black tracking-widest uppercase text-stark-1000 mb-1">
+                FRANK SAMI / VERS
+            </div>
+            <div class="font-mono text-[11px] text-stark-600 font-bold break-all" id="qrUrlText">
+                instagram.com/frank_sami_vers
+            </div>
+        </div>
+
+        <div class="text-[10px] font-mono text-stark-0 bg-stark-1000 px-4 py-2 uppercase tracking-widest border border-stark-0">
+            TAP ANYWHERE TO CLOSE
+        </div>
+    </div>
+
+    <!-- JavaScript Interactions & Offline QR Script -->
+    <script>
+        // Update footer copyright year dynamically
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Offline QR Modal Handler
+        const qrModal = document.getElementById('qrModal');
+        const qrOpenBtn = document.getElementById('qrOpenBtn');
+        const qrCloseBtn = document.getElementById('qrCloseBtn');
+        const qrUrlText = document.getElementById('qrUrlText');
+
+        qrOpenBtn.addEventListener('click', () => {
+            qrModal.classList.remove('hidden');
+            const targetUrl = window.location.href || "https://www.instagram.com/frank_sami_vers";
+            qrUrlText.textContent = targetUrl.replace(/^https?:\/\//, '');
+
+            // Render QR Code client-side so it works in dead zones/subway tunnels
+            const qrcodeContainer = document.getElementById("qrcode");
+            qrcodeContainer.innerHTML = "";
+            
+            new QRCode(qrcodeContainer, {
+                text: targetUrl,
+                width: 180,
+                height: 180,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        });
+
+        qrCloseBtn.addEventListener('click', () => {
+            qrModal.classList.add('hidden');
+        });
+
+        qrModal.addEventListener('click', (e) => {
+            if (e.target === qrModal) {
+                qrModal.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
